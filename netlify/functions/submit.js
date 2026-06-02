@@ -3,7 +3,7 @@ exports.handler = async (event) => {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
 
-  const NOTION_TOKEN = "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";
+  const NOTION_TOKEN = process.env.NOTION_TOKEN;
   const DATABASE_ID = "372efdfe9cbb80afa975fa9f58d7c5c8";
 
   let data;
