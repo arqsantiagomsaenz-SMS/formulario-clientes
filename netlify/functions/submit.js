@@ -13,141 +13,92 @@ exports.handler = async (event) => {
     return { statusCode: 400, body: "Invalid JSON" };
   }
 
+  // Construir texto completo de respuestas
+  const respuestas = `
+👤 PERFIL DEL HOGAR
+Nombre: ${data.nombre || ""}
+Email: ${data.email || ""}
+Habitantes: ${data.habitantes || ""}
+Empleada: ${data.empleada || ""}
+Mascotas: ${data.mascotas || ""}
+
+🌅 LA MAÑANA
+Despertar: ${data.rutina_manana || ""}
+Rutina de baño: ${data.rutina_bano || ""}
+Productos baño: ${data.productos_bano || ""}
+Baño compartido: ${data.bano_compartido || ""}
+Vestirse: ${data.vestirse || ""}
+Plancha: ${data.plancha || ""}
+Desayuno: ${data.desayuno || ""}
+Al salir: ${data.al_salir || ""}
+Objetos que busca: ${data.objetos_perdidos || ""}
+
+🏠 LLEGADA Y MEDIODÍA
+Llegada a casa: ${data.llegada_casa || ""}
+Cosas que trae: ${data.cosas_llegada || ""}
+Almuerzo: ${data.almuerzo || ""}
+Rutina almuerzo: ${data.rutina_almuerzo || ""}
+
+🍳 COCINA
+Frecuencia cocina: ${data.cocina_frecuencia || ""}
+Tipo de cocina: ${data.tipo_cocina || ""}
+Bebidas: ${data.bebidas || ""}
+Electrodomésticos diarios: ${data.electro_diarios || ""}
+Problemas cocina: ${data.cocina_problemas || ""}
+
+🧑‍🤝‍🧑 VIDA SOCIAL
+Tiempo libre solo: ${data.tiempo_libre || ""}
+Planes en pareja: ${data.planes_pareja || ""}
+Frecuencia visitas: ${data.visitas_frecuencia || ""}
+Planes con visitas: ${data.planes_visitas || ""}
+
+🌙 TARDES Y NOCHES
+Tardes en casa: ${data.tardes || ""}
+Teletrabajo: ${data.teletrabajo || ""}
+Pasatiempos: ${data.hobbies || ""}
+Ritual de noche: ${data.ritual_noche || ""}
+
+🛏️ HABITACIÓN Y CLOSET
+Uso habitación: ${data.uso_habitacion || ""}
+Ropa colgada: ${data.ropa_colgada || ""}
+Ropa doblada: ${data.ropa_doblada || ""}
+Zapatos: ${data.zapatos || ""}
+Bolsos: ${data.bolsos || ""}
+Ropa especial: ${data.ropa_especial || ""}
+
+📅 FINES DE SEMANA
+Sábado típico: ${data.fin_semana || ""}
+Deporte: ${data.deporte || ""}
+Balcón/terraza: ${data.balcon || ""}
+
+📦 ALMACENAMIENTO
+Tecnología: ${data.tecnologia || ""}
+Colecciones: ${data.colecciones || ""}
+Limpieza: ${data.limpieza || ""}
+Lavado de ropa: ${data.lavado || ""}
+Otros elementos: ${data.otros_almacenamiento || ""}
+
+💭 EL HOGAR QUE SUEÑA
+Frustraciones y sueños: ${data.frustraciones || ""}
+`.trim();
+
+  // Notion limita rich_text a 2000 caracteres por bloque
+  // Dividimos en chunks de 2000
+  const chunks = [];
+  for (let i = 0; i < respuestas.length; i += 1900) {
+    chunks.push(respuestas.substring(i, i + 1900));
+  }
+
+  const richTextBlocks = chunks.map(chunk => ({
+    text: { content: chunk }
+  }));
+
   const props = {
     "Nombre": {
       title: [{ text: { content: data.nombre || "Sin nombre" } }]
     },
-    "Email": {
-      email: data.email || null
-    },
-    "Habitantes": {
-      rich_text: [{ text: { content: data.habitantes || "" } }]
-    },
-    "Empleada": {
-      rich_text: [{ text: { content: data.empleada || "" } }]
-    },
-    "Mascotas": {
-      rich_text: [{ text: { content: data.mascotas || "" } }]
-    },
-    "Rutina Mañana": {
-      rich_text: [{ text: { content: (data.rutina_manana || "").substring(0, 2000) } }]
-    },
-    "Rutina Baño": {
-      rich_text: [{ text: { content: (data.rutina_bano || "").substring(0, 2000) } }]
-    },
-    "Productos Baño": {
-      rich_text: [{ text: { content: data.productos_bano || "" } }]
-    },
-    "Baño Compartido": {
-      rich_text: [{ text: { content: (data.bano_compartido || "").substring(0, 2000) } }]
-    },
-    "Vestirse": {
-      rich_text: [{ text: { content: (data.vestirse || "").substring(0, 2000) } }]
-    },
-    "Plancha": {
-      rich_text: [{ text: { content: data.plancha || "" } }]
-    },
-    "Desayuno": {
-      rich_text: [{ text: { content: data.desayuno || "" } }]
-    },
-    "Al Salir": {
-      rich_text: [{ text: { content: (data.al_salir || "").substring(0, 2000) } }]
-    },
-    "Objetos Perdidos": {
-      rich_text: [{ text: { content: data.objetos_perdidos || "" } }]
-    },
-    "Llegada Casa": {
-      rich_text: [{ text: { content: (data.llegada_casa || "").substring(0, 2000) } }]
-    },
-    "Cosas Llegada": {
-      rich_text: [{ text: { content: data.cosas_llegada || "" } }]
-    },
-    "Almuerzo": {
-      rich_text: [{ text: { content: data.almuerzo || "" } }]
-    },
-    "Rutina Almuerzo": {
-      rich_text: [{ text: { content: (data.rutina_almuerzo || "").substring(0, 2000) } }]
-    },
-    "Cocina Frecuencia": {
-      rich_text: [{ text: { content: data.cocina_frecuencia || "" } }]
-    },
-    "Tipo Cocina": {
-      rich_text: [{ text: { content: data.tipo_cocina || "" } }]
-    },
-    "Bebidas": {
-      rich_text: [{ text: { content: data.bebidas || "" } }]
-    },
-    "Electrodomesticos Diarios": {
-      rich_text: [{ text: { content: data.electro_diarios || "" } }]
-    },
-    "Cocina Problemas": {
-      rich_text: [{ text: { content: (data.cocina_problemas || "").substring(0, 2000) } }]
-    },
-    "Tiempo Libre Solo": {
-      rich_text: [{ text: { content: data.tiempo_libre || "" } }]
-    },
-    "Planes Pareja": {
-      rich_text: [{ text: { content: data.planes_pareja || "" } }]
-    },
-    "Visitas Frecuencia": {
-      rich_text: [{ text: { content: data.visitas_frecuencia || "" } }]
-    },
-    "Planes Visitas": {
-      rich_text: [{ text: { content: (data.planes_visitas || "").substring(0, 2000) } }]
-    },
-    "Teletrabajo": {
-      rich_text: [{ text: { content: data.teletrabajo || "" } }]
-    },
-    "Hobbies": {
-      rich_text: [{ text: { content: (data.hobbies || "").substring(0, 2000) } }]
-    },
-    "Ritual Noche": {
-      rich_text: [{ text: { content: (data.ritual_noche || "").substring(0, 2000) } }]
-    },
-    "Uso Habitacion": {
-      rich_text: [{ text: { content: data.uso_habitacion || "" } }]
-    },
-    "Ropa Colgada": {
-      rich_text: [{ text: { content: data.ropa_colgada || "" } }]
-    },
-    "Ropa Doblada": {
-      rich_text: [{ text: { content: data.ropa_doblada || "" } }]
-    },
-    "Zapatos": {
-      rich_text: [{ text: { content: data.zapatos || "" } }]
-    },
-    "Bolsos": {
-      rich_text: [{ text: { content: data.bolsos || "" } }]
-    },
-    "Ropa Especial": {
-      rich_text: [{ text: { content: data.ropa_especial || "" } }]
-    },
-    "Fin de Semana": {
-      rich_text: [{ text: { content: (data.fin_semana || "").substring(0, 2000) } }]
-    },
-    "Deporte": {
-      rich_text: [{ text: { content: data.deporte || "" } }]
-    },
-    "Balcon": {
-      rich_text: [{ text: { content: (data.balcon || "").substring(0, 2000) } }]
-    },
-    "Tecnologia": {
-      rich_text: [{ text: { content: data.tecnologia || "" } }]
-    },
-    "Colecciones": {
-      rich_text: [{ text: { content: (data.colecciones || "").substring(0, 2000) } }]
-    },
-    "Limpieza": {
-      rich_text: [{ text: { content: data.limpieza || "" } }]
-    },
-    "Lavado": {
-      rich_text: [{ text: { content: (data.lavado || "").substring(0, 2000) } }]
-    },
-    "Otros Almacenamiento": {
-      rich_text: [{ text: { content: (data.otros_almacenamiento || "").substring(0, 2000) } }]
-    },
-    "Frustraciones": {
-      rich_text: [{ text: { content: (data.frustraciones || "").substring(0, 2000) } }]
+    "Respuestas": {
+      rich_text: richTextBlocks
     }
   };
 
