@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cuestionario de Vida — Diseño Interior</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F5F0E8; --warm-white: #FAF7F2; --charcoal: #1C1C1A;
+    --taupe: #8B7355; --taupe-light: #C4AD8E; --accent: #6B4F3A;
+    --border: #D9CFC0; --section-bg: #FFFFFF; --muted: #9A8F80;
+    --note-bg: #FDF6EC; --note-border: #E8D5B5;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--cream); font-family:'DM Sans',sans-serif; color:var(--charcoal); }
+  .header { background:var(--charcoal); color:var(--cream); padding:60px 40px 50px; position:relative; overflow:hidden; }
+  .header::before { content:''; position:absolute; top:-40px; right:-40px; width:300px; height:300px; border:1px solid rgba(196,173,142,0.2); border-radius:50%; }
+  .header-inner { max-width:860px; margin:0 auto; position:relative; z-index:1; }
+  .brand { font-family:'Cormorant Garamond',serif; font-size:11px; letter-spacing:4px; text-transform:uppercase; color:var(--taupe-light); margin-bottom:24px; display:block; }
+  .header h1 { font-family:'Cormorant Garamond',serif; font-size:clamp(34px,6vw,56px); font-weight:300; line-height:1.1; margin-bottom:20px; }
+  .header h1 em { font-style:italic; color:var(--taupe-light); }
+  .header p { font-size:14px; line-height:1.8; color:rgba(245,240,232,0.7); max-width:580px; font-weight:300; }
+  .main { max-width:860px; margin:0 auto; padding:0 20px 80px; }
+  .section { background:var(--section-bg); border:1px solid var(--border); border-radius:2px; margin-top:32px; overflow:hidden; }
+  .section-header { padding:28px 36px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:20px; background:var(--warm-white); }
+  .section-number { width:40px; height:40px; background:var(--charcoal); color:var(--cream); font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:300; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .section-title { font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:400; display:block; }
+  .section-subtitle { font-size:12px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; margin-top:2px; display:block; }
+  .section-note { background:var(--note-bg); border-left:3px solid var(--taupe-light); padding:16px 20px; margin:0 36px 28px; }
+  .section-note p { font-size:13px; color:var(--accent); line-height:1.7; font-style:italic; }
+  .section-note strong { font-style:normal; font-weight:500; }
+  .section-body { padding:32px 36px; }
+  .question { margin-bottom:28px; }
+  .question:last-child { margin-bottom:0; }
+  .question label { display:block; font-size:14px; font-weight:500; margin-bottom:6px; line-height:1.5; }
+  .q-note { background:var(--note-bg); border:1px solid var(--note-border); padding:10px 14px; margin-bottom:10px; font-size:12px; color:var(--accent); line-height:1.7; font-style:italic; }
+  input[type="text"], input[type="email"], select, textarea {
+    width:100%; border:1px solid var(--border); padding:12px 16px;
+    font-family:'DM Sans',sans-serif; font-size:14px; color:var(--charcoal);
+    background:var(--warm-white); outline:none; -webkit-appearance:none; border-radius:1px;
+  }
+  input:focus, select:focus, textarea:focus { border-color:var(--taupe); background:#fff; }
+  textarea { min-height:90px; resize:vertical; line-height:1.7; }
+  select { cursor:pointer; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238B7355' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 16px center; padding-right:40px; }
+  .options-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:8px; margin-top:4px; }
+  .option-item { display:flex; align-items:center; gap:10px; padding:10px 14px; border:1px solid var(--border); cursor:pointer; background:var(--warm-white); font-size:13px; line-height:1.4; }
+  .option-item:hover { border-color:var(--taupe); }
+  .option-item input { width:16px; height:16px; accent-color:var(--accent); cursor:pointer; flex-shrink:0; }
+  .q-divider { height:1px; background:var(--border); margin:28px 0; opacity:0.5; }
+  .row-2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  .subsection { background:var(--warm-white); border:1px solid var(--border); padding:24px; margin-bottom:24px; }
+  .subsection-title { font-family:'Cormorant Garamond',serif; font-size:16px; color:var(--accent); margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+  .subsection-title::before { content:''; width:20px; height:1px; background:var(--taupe-light); }
+  .step-list { display:flex; flex-direction:column; gap:12px; }
+  .step-item { display:flex; gap:12px; align-items:flex-start; }
+  .step-num { width:28px; height:28px; background:var(--charcoal); color:var(--cream); font-family:'Cormorant Garamond',serif; font-size:13px; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; }
+  .step-item textarea { min-height:60px; }
+  .submit-section { background:var(--charcoal); padding:48px 36px; margin-top:32px; text-align:center; }
+  .submit-section h3 { font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:300; color:var(--cream); margin-bottom:12px; }
+  .submit-section p { font-size:13px; color:rgba(245,240,232,0.6); margin-bottom:32px; }
+  .btn-submit { background:var(--taupe-light); color:var(--charcoal); font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500; letter-spacing:2px; text-transform:uppercase; padding:16px 48px; border:none; cursor:pointer; transition:all 0.3s; }
+  .btn-submit:hover { background:var(--cream); }
+  .btn-submit:disabled { opacity:0.6; cursor:not-allowed; }
+  .toast { position:fixed; bottom:30px; right:30px; background:var(--charcoal); color:var(--cream); padding:16px 24px; font-size:13px; border-left:3px solid var(--taupe-light); transform:translateX(120%); transition:transform 0.4s; z-index:1000; max-width:320px; }
+  .toast.show { transform:translateX(0); }
+  .toast.error { border-left-color:#e05252; }
+  @media(max-width:640px) {
+    .row-2 { grid-template-columns:1fr; }
+    .section-body, .section-header { padding:20px; }
+    .section-note { margin:0 20px 20px; }
+    .options-grid { grid-template-columns:1fr; }
+    .header { padding:40px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <span class="brand">Diseño Interior · Cuestionario de Vida</span>
+    <h1>Cuéntame <em>cómo vivís</em><br>tu hogar</h1>
+    <p>Este cuestionario me permite entender tu rutina real, tus hábitos cotidianos y la manera en que habitás cada espacio. No hay respuestas correctas — entre más detallado seas, mejor puedo diseñar un hogar que realmente te pertenezca.</p>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- S1 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">1</div>
+    <div>
+      <span class="section-title">Perfil del hogar</span>
+      <span class="section-subtitle">Quiénes habitan este espacio</span>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="section-note"><p><strong>¿Por qué te pregunto esto?</strong> Conocer a todos los habitantes — sus edades, roles y necesidades — me permite diseñar espacios que funcionen para cada uno.</p></div>
+    <div class="row-2">
+      <div class="question"><label>Nombre completo *</label><input type="text" id="nombre" placeholder="Tu nombre"></div>
+      <div class="question"><label>Correo electrónico</label><input type="email" id="email" placeholder="correo@ejemplo.com"></div>
+    </div>
+    <div class="q-divider"></div>
+    <div class="question">
+      <label>¿Cuántas personas viven en el hogar y quiénes son? *</label>
+      <div class="q-note">Mencioná edades y relación. Ej: "Vivo con mi pareja (35) y nuestro hijo de 7 años."</div>
+      <textarea id="habitantes" placeholder="Vivo solo/a / con mi pareja / con hijos de X años..."></textarea>
+    </div>
+    <div class="q-divider"></div>
+    <div class="question">
+      <label>¿Hay empleada del hogar?</label>
+      <div class="options-grid" id="empleada-opts">
+        <label class="option-item"><input type="radio" name="empleada" value="No"> No</label>
+        <label class="option-item"><input type="radio" name="empleada" value="Sí, externa"> Sí, viene por días (externa)</label>
+        <label class="option-item"><input type="radio" name="empleada" value="Sí, interna"> Sí, vive en el hogar (interna)</label>
+      </div>
+    </div>
+    <div class="q-divider"></div>
+    <div class="question">
+      <label>¿Tienen animales de compañía?</label>
+      <div class="options-grid" id="mascotas-opts">
+        <label class="option-item"><input type="checkbox" value="No"> No tengo mascotas</label>
+        <label class="option-item"><input type="checkbox" value="Perro(s)"> Perro(s)</label>
+        <label class="option-item"><input type="checkbox" value="Gato(s)"> Gato(s)</label>
+        <label class="option-item"><input type="checkbox" value="Aves"> Aves</label>
+        <label class="option-item"><input type="checkbox" value="Otro"> Otro</label>
+      </div>
+      <textarea id="mascotas-detalle" style="margin-top:10px;" placeholder="¿Cuántos? ¿Dónde duermen? ¿Suben a los muebles?"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- S2 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">2</div>
+    <div>
+      <span class="section-title">La mañana — paso a paso</span>
+      <span class="section-subtitle">Desde que abrís los ojos hasta que cerrás la puerta</span>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="section-note"><p><strong>¿Por qué te pregunto esto?</strong> La mañana es uno de los momentos más intensos del hogar. Entender cada paso me permite diseñar flujos que no se crucen y espacios que reduzcan el estrés cotidiano.</p></div>
+
+    <div class="subsection">
+      <div class="subsection-title">Al despertar</div>
+      <div class="question">
+        <label>¿A qué hora te levantás? ¿Quién se levanta primero?</label>
+        <textarea id="despertar" placeholder="Me levanto a las 6:30am / mi pareja madruga más..."></textarea>
+      </div>
+      <div class="question">
+        <label>¿Qué hacés en los primeros 5 minutos?</label>
+        <div class="options-grid" id="primeros5-opts">
+          <label class="option-item"><input type="checkbox" value="Baño"> Voy directo al baño</label>
+          <label class="option-item"><input type="checkbox" value="Celular"> Reviso el celular en cama</label>
+          <label class="option-item"><input type="checkbox" value="Café"> Preparo café</label>
+          <label class="option-item"><input type="checkbox" value="Mascota"> Saco a la mascota</label>
+          <label class="option-item"><input type="checkbox" value="Ejercicio"> Hago ejercicio</label>
+          <label class="option-item"><input type="checkbox" value="Niños"> Despierto a los niños</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">El baño de la mañana</div>
+      <div class="question">
+        <label>Describe tu rutina de baño y aseo personal *</label>
+        <div class="q-note"><strong>Nota:</strong> El baño es el espacio que más "toca" el cuerpo a diario. Sé muy específico: ¿cuánto dura la ducha? ¿Compartís el baño? ¿Usás muchos productos?</div>
+        <div class="step-list">
+          <div class="step-item"><div class="step-num">1</div><textarea id="bano1" placeholder="Entro a la ducha, dura aproximadamente..."></textarea></div>
+          <div class="step-item"><div class="step-num">2</div><textarea id="bano2" placeholder="Luego me lavo los dientes / me afeito / me seco el cabello..."></textarea></div>
+          <div class="step-item"><div class="step-num">3</div><textarea id="bano3" placeholder="Después aplico cremas / skincare / maquillaje..."></textarea></div>
+          <div class="step-item"><div class="step-num">4</div><textarea id="bano4" placeholder="El baño completo me toma aproximadamente X minutos..."></textarea></div>
+        </div>
+      </div>
+      <div class="question" style="margin-top:16px;">
+        <label>¿Cuántos productos de aseo usás a diario?</label>
+        <div class="options-grid" id="productos-bano-opts">
+          <label class="option-item"><input type="radio" name="prod_bano" value="Mínimo (3-5)"> Lo mínimo (3-5)</label>
+          <label class="option-item"><input type="radio" name="prod_bano" value="Moderado (6-10)"> Moderado (6-10)</label>
+          <label class="option-item"><input type="radio" name="prod_bano" value="Bastantes (+10)"> Bastantes (+10)</label>
+          <label class="option-item"><input type="radio" name="prod_bano" value="Rutina skincare completa"> Rutina skincare completa</label>
+        </div>
+      </div>
+      <div class="question" style="margin-top:16px;">
+        <label>¿Compartís el baño? ¿Cómo funciona?</label>
+        <textarea id="bano-compartido" placeholder="Comparto con mi pareja / tenemos baños separados / esperamos turnos..."></textarea>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Vestirse</div>
+      <div class="question">
+        <label>¿Cómo es tu proceso de vestirte cada mañana? *</label>
+        <div class="step-list">
+          <div class="step-item"><div class="step-num">1</div><textarea id="vestir1" placeholder="Salgo del baño y voy a... / la ropa la dejo lista desde la noche..."></textarea></div>
+          <div class="step-item"><div class="step-num">2</div><textarea id="vestir2" placeholder="Me visto en la habitación / en el vestier / en el baño porque..."></textarea></div>
+          <div class="step-item"><div class="step-num">3</div><textarea id="vestir3" placeholder="Me pongo los zapatos en... / los tengo organizados en..."></textarea></div>
+        </div>
+      </div>
+      <div class="question" style="margin-top:16px;">
+        <label>¿Necesitás planchar frecuentemente?</label>
+        <div class="options-grid" id="plancha-opts">
+          <label class="option-item"><input type="radio" name="plancha" value="Nunca"> Nunca</label>
+          <label class="option-item"><input type="radio" name="plancha" value="Ocasionalmente"> Ocasionalmente</label>
+          <label class="option-item"><input type="radio" name="plancha" value="Varias veces/semana"> Varias veces/semana</label>
+          <label class="option-item"><input type="radio" name="plancha" value="Casi todos los días"> Casi todos los días</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">El desayuno</div>
+      <div class="question">
+        <label>¿Desayunás en casa? *</label>
+        <div class="options-grid" id="desayuno-opts">
+          <label class="option-item"><input type="radio" name="desayuno" value="No, salgo sin comer"> No, salgo sin comer</label>
+          <label class="option-item"><input type="radio" name="desayuno" value="Algo rápido de pie"> Algo rápido de pie</label>
+          <label class="option-item"><input type="radio" name="desayuno" value="Sentado en comedor"> Sentado en comedor</label>
+          <label class="option-item"><input type="radio" name="desayuno" value="En barra de cocina"> En barra de cocina</label>
+          <label class="option-item"><input type="radio" name="desayuno" value="En la habitación"> En la habitación</label>
+          <label class="option-item"><input type="radio" name="desayuno" value="En el balcón"> En el balcón</label>
+        </div>
+        <textarea id="desayuno-detalle" style="margin-top:10px;" placeholder="¿Qué preparás? ¿Cuánto tiempo? ¿Solo o acompañado?"></textarea>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Al salir de casa</div>
+      <div class="question">
+        <label>Describe los últimos 5 minutos antes de salir *</label>
+        <div class="step-list">
+          <div class="step-item"><div class="step-num">1</div><textarea id="salir1" placeholder="Busco mis llaves / las dejo siempre en..."></textarea></div>
+          <div class="step-item"><div class="step-num">2</div><textarea id="salir2" placeholder="Agarro el maletín / la cartera que están en..."></textarea></div>
+          <div class="step-item"><div class="step-num">3</div><textarea id="salir3" placeholder="Reviso que... / cierro la puerta / salgo por..."></textarea></div>
+        </div>
+      </div>
+      <div class="question" style="margin-top:16px;">
+        <label>¿Qué objetos salís buscando desesperadamente?</label>
+        <div class="options-grid" id="objetos-opts">
+          <label class="option-item"><input type="checkbox" value="Llaves"> Llaves</label>
+          <label class="option-item"><input type="checkbox" value="Celular"> Celular</label>
+          <label class="option-item"><input type="checkbox" value="Audífonos"> Audífonos</label>
+          <label class="option-item"><input type="checkbox" value="Gafas"> Gafas</label>
+          <label class="option-item"><input type="checkbox" value="Paraguas"> Paraguas</label>
+          <label class="option-item"><input type="checkbox" value="Billetera"> Billetera</label>
+          <label class="option-item"><input type="checkbox" value="Llaves del carro"> Llaves del carro</label>
+          <label class="option-item"><input type="checkbox" value="Maletín"> Maletín/morral</label>
+          <label class="option-item"><input type="checkbox" value="Todo lo encuentro"> Todo siempre lo encuentro</label>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S3 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">3</div>
+    <div>
+      <span class="section-title">La llegada y el mediodía</span>
+      <span class="section-subtitle">Entrada al hogar y rutina del almuerzo</span>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="section-note"><p><strong>¿Por qué te pregunto esto?</strong> La llegada es un ritual de transición clave. Si no hay un lugar definido para dejar lo que traés, ese desorden se expande por toda la casa.</p></div>
+
+    <div class="subsection">
+      <div class="subsection-title">El ritual de llegada</div>
+      <div class="question">
+        <label>Describe paso a paso qué hacés cuando llegás a casa *</label>
+        <div class="step-list">
+          <div class="step-item"><div class="step-num">1</div><textarea id="llegada1" placeholder="Entro y lo primero que hago es dejar... en..."></textarea></div>
+          <div class="step-item"><div class="step-num">2</div><textarea id="llegada2" placeholder="Luego voy a... / me cambio de ropa / voy al baño..."></textarea></div>
+          <div class="step-item"><div class="step-num">3</div><textarea id="llegada3" placeholder="Después me dirijo a... / prendo... / preparo..."></textarea></div>
+          <div class="step-item"><div class="step-num">4</div><textarea id="llegada4" placeholder="Finalmente me instalo en... / pongo música..."></textarea></div>
+        </div>
+      </div>
+      <div class="question" style="margin-top:16px;">
+        <label>¿Con qué cosas llegás habitualmente?</label>
+        <div class="options-grid" id="cosas-llegada-opts">
+          <label class="option-item"><input type="checkbox" value="Maletín"> Maletín o bolso</label>
+          <label class="option-item"><input type="checkbox" value="Mercado"> Mercado / compras</label>
+          <label class="option-item"><input type="checkbox" value="Domicilios"> Domicilios / paquetes</label>
+          <label class="option-item"><input type="checkbox" value="Paraguas"> Paraguas / impermeable</label>
+          <label class="option-item"><input type="checkbox" value="Deportes"> Implementos deportivos</label>
+          <label class="option-item"><input type="checkbox" value="Bicicleta"> Bicicleta / patineta</label>
+          <label class="option-item"><input type="checkbox" value="Portátil"> Portátil y papeles</label>
+          <label class="option-item"><input type="checkbox" value="Casco"> Casco de moto</label>
+          <label class="option-item"><input type="checkbox" value="Lo mínimo"> Llego con lo mínimo</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">El almuerzo</div>
+      <div class="question">
+        <label>¿Almorzás en casa entre semana? *</label>
+        <div class="options-grid" id="almuerzo-opts">
+          <label class="option-item"><input type="radio" name="almuerzo" value="Nunca"> Nunca</label>
+          <label class="option-item"><input type="radio" name="almuerzo" value="1-2 veces/semana"> 1-2 veces/semana</label>
+          <label class="option-item"><input type="radio" name="almuerzo" value="Casi siempre"> Casi siempre</label>
+          <label class="option-item"><input type="radio" name="almuerzo" value="Siempre, trabajo desde casa"> Siempre, trabajo desde casa</label>
+        </div>
+      </div>
+      <div class="question" style="margin-top:16px;">
+        <label>Si almorzás en casa, describe cómo es ese momento</label>
+        <div class="step-list">
+          <div class="step-item"><div class="step-num">1</div><textarea id="alm1" placeholder="Llego / ya está cocinado / pido domicilio / caliento..."></textarea></div>
+          <div class="step-item"><div class="step-num">2</div><textarea id="alm2" placeholder="Sirvo en... / ponemos la mesa / comemos en la sala..."></textarea></div>
+          <div class="step-item"><div class="step-num">3</div><textarea id="alm3" placeholder="Después del almuerzo... / descanso / vuelvo al trabajo..."></textarea></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S4 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">4</div>
+    <div>
+      <span class="section-title">La cocina y la alimentación</span>
+      <span class="section-subtitle">Cómo se usa el corazón del hogar</span>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="section-note"><p><strong>¿Por qué te pregunto esto?</strong> La cocina es el espacio que más varía según los hábitos de cada familia. El diseño cambia radicalmente: almacenamiento, electrodomésticos, superficies, flujo.</p></div>
+    <div class="question">
+      <label>¿Con qué frecuencia cocinan? ¿Quién cocina? *</label>
+      <div class="options-grid" id="cocina-freq-opts">
+        <label class="option-item"><input type="radio" name="cocina_freq" value="Casi nunca"> Casi nunca</label>
+        <label class="option-item"><input type="radio" name="cocina_freq" value="1-2 veces/semana"> 1-2 veces/semana</label>
+        <label class="option-item"><input type="radio" name="cocina_freq" value="Casi todos los días"> Casi todos los días</label>
+        <label class="option-item"><input type="radio" name="cocina_freq" value="Todos los días, amamos cocinar"> Todos los días, amamos cocinar</label>
+      </div>
+      <textarea id="cocina-quien" style="margin-top:10px;" placeholder="¿Quién cocina principalmente? ¿La empleada cocina?"></textarea>
+    </div>
+    <div class="q-divider"></div>
+    <div class="question">
+      <label>¿Qué tipo de cocina hacen?</label>
+      <div class="options-grid" id="tipo-cocina-opts">
+        <label class="option-item"><input type="checkbox" value="Comidas rápidas"> Comidas sencillas y rápidas</label>
+        <label class="option-item"><input type="checkbox" value="Recetas elaboradas"> Recetas elaboradas</label>
+        <label class="option-item"><input type="checkbox" value="Repostería"> Repostería y panadería</label>
+        <label class="option-item"><input type="checkbox" value="Asados"> Asados y parrilla</label>
+        <label class="option-item"><input type="checkbox" value="Cocina saludable"> Cocina saludable</label>
+        <label class="option-item"><input type="checkbox" value="Meal prep"> Meal prep semanal</label>
+      </div>
+    </div>
+    <div class="q-divider"></div>
+    <div class="question">
+      <label>¿Hacen bebidas especiales?</label>
+      <div class="options-grid" id="bebidas-opts">
+        <label class="option-item"><input type="checkbox" value="Café especialidad"> Fanático/a del café</label>
+        <label class="option-item"><input type="checkbox" value="Cócteles"> Cócteles con amigos</label>
+        <label class="option-item"><input type="checkbox" value="Jugos/smoothies"> Jugos y smoothies</label>
+        <label class="option-item"><input type="checkbox" value="Vinos"> Tenemos buen vino</label>
+        <label class="option-item"><input type="checkbox" value="Básico"> Bebidas básicas solo</label>
+      </div>
+      <textarea id="bebidas-detalle" style="margin-top:10px;" placeholder="¿Tenés equipos especiales de café? ¿Con qué frecuencia preparás para invitados?"></textarea>
+    </div>
+    <div class="q-divider"></div>
+    <div class="question">
+      <label>Electrodomésticos de uso diario (van sobre el mesón)</label>
+      <div class="options-grid" id="electro-opts">
+        <label class="option-item"><input type="checkbox" value="Cafetera"> Cafetera</label>
+        <label class="option-item"><input type="checkbox" value="Tostadora"> Tostadora</label>
+        <label class="option-item"><input type="checkbox" value="Licuadora"> Licuadora</label>
+        <label class="option-item"><input type="checkbox" value="Freidora de aire"> Freidora de aire</label>
+        <label class="option-item"><input type="checkbox" value="Microondas"> Microondas</label>
+        <label class="option-item"><input type="checkbox" value="Sanduchera"> Sanduchera</label>
+      </div>
+    </div>
+    <div class="q-divider"></div>
+    <div class="question">
+      <label>¿Qué le falta o sobra a tu cocina actual?</label>
+      <textarea id="cocina-problemas" placeholder="Me falta almacenamiento / el mesón es pequeño / necesito más gavetas..."></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- S5 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">5</div>
+    <div>
+      <span class="section-title">Vida social y planes en casa</span>
+      <span class="section-subtitle">Solos, en pareja y con el mundo</span>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="section-note"><p><strong>¿Por qué te pregunto esto?</strong> Un hogar que recibe visitas frecuentes necesita flujos y espacios completamente distintos a uno que es refugio personal.</p></div>
+
+    <div class="subsection">
+      <div class="subsection-title">Tiempo libre solo/a</div>
+      <div class="question">
+        <label>¿Qué hacés cuando estás solo/a en casa? *</label>
+        <div class="options-grid" id="tiempo-libre-opts">
+          <label class="option-item"><input type="checkbox" value="Lectura"> Leo</label>
+          <label class="option-item"><input type="checkbox" value="Series"> Veo series</label>
+          <label class="option-item"><input type="checkbox" value="Cocino"> Pongo música y cocino</label>
+          <label class="option-item"><input type="checkbox" value="Ejercicio"> Hago ejercicio</label>
+          <label class="option-item"><input type="checkbox" value="Proyectos personales"> Proyectos personales</label>
+          <label class="option-item"><input type="checkbox" value="Meditación"> Medito / yoga</label>
+          <label class="option-item"><input type="checkbox" value="Manualidades"> Manualidades</label>
+          <label class="option-item"><input type="checkbox" value="Instrumento"> Toco instrumento</label>
+          <label class="option-item"><input type="checkbox" value="Videojuegos"> Videojuegos</label>
+          <label class="option-item"><input type="checkbox" value="Balcón"> Salgo al balcón</label>
+        </div>
+        <textarea id="tiempo-libre-detalle" style="margin-top:10px;" placeholder="Cuéntame más: ¿cuánto duran esos momentos? ¿En qué espacio ocurren?"></textarea>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Planes en pareja o familia</div>
+      <div class="question">
+        <label>¿Qué planes hacen juntos en casa?</label>
+        <div class="options-grid" id="planes-pareja-opts">
+          <label class="option-item"><input type="checkbox" value="Series juntos"> Series juntos</label>
+          <label class="option-item"><input type="checkbox" value="Cocinan juntos"> Cocinan juntos</label>
+          <label class="option-item"><input type="checkbox" value="Juegos de mesa"> Juegos de mesa</label>
+          <label class="option-item"><input type="checkbox" value="Cada quien en lo suyo"> Cada quien en lo suyo</label>
+          <label class="option-item"><input type="checkbox" value="Deporte juntos"> Deporte juntos</label>
+          <label class="option-item"><input type="checkbox" value="Leen juntos"> Leen en el mismo espacio</label>
+          <label class="option-item"><input type="checkbox" value="Trabajan desde casa"> Los dos teletrabajan</label>
+        </div>
+        <textarea id="planes-pareja-detalle" style="margin-top:10px;" placeholder="Describí esos momentos en casa: ¿dónde ocurren? ¿qué tan frecuentes son?"></textarea>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Visitas</div>
+      <div class="question">
+        <label>¿Con qué frecuencia reciben visitas? *</label>
+        <div class="options-grid" id="visitas-opts">
+          <label class="option-item"><input type="radio" name="visitas" value="Raramente"> Raramente</label>
+          <label class="option-item"><input type="radio" name="visitas" value="Algún fin de semana al mes"> Algún fin de semana al mes</label>
+          <label class="option-item"><input type="radio" name="visitas" value="Casi cada semana"> Casi cada semana</label>
+          <label class="option-item"><input type="radio" name="visitas" value="Somos la casa de reunión"> Somos la casa de reunión</label>
+        </div>
+      </div>
+      <div class="question" style="margin-top:16px;">
+        <label>¿Cuántas personas vienen y para qué planes?</label>
+        <textarea id="visitas-detalle" placeholder="Vienen entre 4 y 8 amigos / a veces somos 15 / para cenar / para ver el partido..."></textarea>
+      </div>
+      <div class="question" style="margin-top:16px;">
+        <label>¿Tipo de planes con visitas?</label>
+        <div class="options-grid" id="planes-visitas-opts">
+          <label class="option-item"><input type="checkbox" value="Cenas"> Cenas y almuerzos</label>
+          <label class="option-item"><input type="checkbox" value="Cócteles"> Cócteles o copas</label>
+          <label class="option-item"><input type="checkbox" value="Reuniones informales"> Reuniones informales</label>
+          <label class="option-item"><input type="checkbox" value="Ver deporte"> Ver deporte</label>
+          <label class="option-item"><input type="checkbox" value="Celebraciones"> Celebraciones</label>
+          <label class="option-item"><input type="checkbox" value="Juegos de mesa"> Juegos de mesa</label>
+          <label class="option-item"><input type="checkbox" value="Música y baile"> Música y baile</label>
+          <label class="option-item"><input type="checkbox" value="Balcón"> Planes en balcón</label>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S6 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">6</div>
+    <div>
+      <span class="section-title">Tardes, noches y hobbies</span>
+      <span class="section-subtitle">Cómo descansás y qué te apasiona</span>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="section-note"><p><strong>¿Por qué te pregunto esto?</strong> Los hobbies determinan necesidades reales de espacio. Un hobby puede ser solo un cajón o puede requerir todo un cuarto.</p></div>
+    <div class="question">
+      <label>¿Qué hacés en las tardes o noches al llegar? *</label>
+      <textarea id="tardes" placeholder="Me cambio y me siento en el sofá / voy al estudio / cocino / salgo al balcón..."></textarea>
+    </div>
+    <div class="q-divider"></div>
+    <div class="question">
+      <label>¿Teletrabajas desde casa?</label>
+      <div class="options-grid" id="teletrabajo-opts">
+        <label class="option-item"><input type="radio" name="teletrabajo" value="No"> No, salgo siempre</label>
+        <label class="option-item"><input type="radio" name="teletrabajo" value="Algunos días"> Algunos días</label>
+        <label class="option-item"><input type="radio" name="teletrabajo" value="100% desde casa"> 100% desde casa</label>
+        <label class="option-item"><input type="radio" name="teletrabajo" value="Freelance adicional"> Tengo freelance adicional</label>
+      </div>
+      <textarea id="teletrabajo-detalle" style="margin-top:10px;" placeholder="¿Dónde trabajás en casa? ¿Tenés videollamadas? ¿Necesitás zona privada?"></textarea>
+    </div>
+    <div class="q-divider"></div>
+    <div class="question">
+      <label>¿Cuáles son tus hobbies en casa?</label>
+      <div class="options-grid" id="hobbies-opts">
+        <label class="option-item"><input type="checkbox" value="Lectura"> Lectura</label>
+        <label class="option-item"><input type="checkbox" value="Pintura"> Pintura o dibujo</label>
+        <label class="option-item"><input type="checkbox" value="Costura"> Costura o tejido</label>
+        <label class="option-item"><input type="checkbox" value="Fotografía"> Fotografía</label>
+        <label class="option-item"><input type="checkbox" value="Música"> Música (instrumento)</label>
+        <label class="option-item"><input type="checkbox" value="Videojuegos"> Videojuegos</label>
+        <label class="option-item"><input type="checkbox" value="Manualidades"> Manualidades</label>
+        <label class="option-item"><input type="checkbox" value="Yoga"> Yoga / meditación</label>
+        <label class="option-item"><input type="checkbox" value="Ejercicio"> Ejercicio en casa</label>
+        <label class="option-item"><input type="checkbox" value="Plantas"> Plantas / jardinería</label>
+        <label class="option-item"><input type="checkbox" value="Juegos de mesa"> Juegos de mesa</label>
+      </div>
+      <textarea id="hobbies-detalle" style="margin-top:10px;" placeholder="Para cada hobby: ¿cuántos materiales? ¿Dónde los guardás? ¿Necesitan espacio fijo?"></textarea>
+    </div>
+    <div class="q-divider"></div>
+    <div class="question">
+      <label>¿Cómo son tus noches antes de dormir?</label>
+      <textarea id="ritual-noche" placeholder="Me lavo los dientes, aplico cremas / leo 30 minutos / veo el celular..."></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- S7 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">7</div>
+    <div>
+      <span class="section-title">Habitación, closet y baño</span>
+      <span class="section-subtitle">Las zonas más personales del hogar</span>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="section-note"><p><strong>¿Por qué te pregunto esto?</strong> Los closets mal dimensionados y los baños sin superficie son los errores más comunes en diseño. Necesito saber exactamente cómo vivís estos espacios.</p></div>
+    <div class="question">
+      <label>¿Cómo usás tu habitación además de dormir? *</label>
+      <div class="options-grid" id="habitacion-opts">
+        <label class="option-item"><input type="checkbox" value="Solo dormir"> Solo para dormir</label>
+        <label class="option-item"><input type="checkbox" value="Lectura"> Leo en cama</label>
+        <label class="option-item"><input type="checkbox" value="TV en cama"> Veo TV en cama</label>
+        <label class="option-item"><input type="checkbox" value="Trabajo"> Trabajo o estudio allí</label>
+        <label class="option-item"><input type="checkbox" value="Maquillaje"> Me arreglo y maquillo</label>
+        <label class="option-item"><input type="checkbox" value="Ejercicio"> Hago ejercicio / yoga</label>
+        <label class="option-item"><input type="checkbox" value="Refugio"> Es mi refugio total</label>
+      </div>
+      <textarea id="habitacion-detalle" style="margin-top:10px;" placeholder="Describime cómo es ese espacio en tu vida cotidiana..."></textarea>
+    </div>
+    <div class="q-divider"></div>
+    <div class="question">
+      <label>Ropa colgada (blusas, camisas, vestidos, sacos)</label>
+      <select id="ropa-colgada">
+        <option value="">Aproximadamente...</option>
+        <option>Menos de 20 prendas</option>
+        <option>Entre 20 y 40 prendas</option>
+        <option>Entre 40 y 70 prendas</option>
+        <option>Más de 70 prendas</option>
+      </select>
+    </div>
+    <div class="question" style="margin-top:16px;">
+      <label>Ropa doblada (camisetas, pantalones, ropa interior)</label>
+      <select id="ropa-doblada">
+        <option value="">Aproximadamente...</option>
+        <option>Pocas, soy minimalista</option>
+        <option>Cantidad moderada</option>
+        <option>Bastante, necesito varias gavetas</option>
+        <option>Mucha, siempre me falta espacio</option>
+      </select>
+    </div>
+    <div class="row-2" style="margin-top:16px;">
+      <div class="question">
+        <label>Pares de zapatos</label>
+        <select id="zapatos">
+          <option value="">Selecciona</option>
+          <option>Menos de 10 pares</option>
+          <option>Entre 10 y 20 pares</option>
+          <option>Entre 20 y 35 pares</option>
+          <option>Más de 35 pares</option>
+        </select>
+      </div>
+      <div class="question">
+        <label>Bolsos y carteras</label>
+        <select id="bolsos">
+          <option value="">Selecciona</option>
+          <option>2-4 bolsos básicos</option>
+          <option>Entre 5 y 10</option>
+          <option>Más de 10</option>
+        </select>
+      </div>
+    </div>
+    <div class="question" style="margin-top:16px;">
+      <label>¿Tienen ropa o accesorios especiales?</label>
+      <div class="options-grid" id="ropa-especial-opts">
+        <label class="option-item"><input type="checkbox" value="Ropa de frío"> Ropa de frío / abrigos</label>
+        <label class="option-item"><input type="checkbox" value="Ropa deportiva"> Ropa deportiva</label>
+        <label class="option-item"><input type="checkbox" value="Uniformes"> Uniformes de trabajo</label>
+        <label class="option-item"><input type="checkbox" value="Ropa formal"> Ropa formal / de gala</label>
+        <label class="option-item"><input type="checkbox" value="Temporada"> Ropa de temporada</label>
+        <label class="option-item"><input type="checkbox" value="Joyas"> Joyas y bisutería</label>
+        <label class="option-item"><input type="checkbox" value="Relojes"> Colección de relojes</label>
+        <label class="option-item"><input type="checkbox" value="Gafas"> Varias gafas de sol</label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S8 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">8</div>
+    <div>
+      <span class="section-title">Fines de semana</span>
+      <span class="section-subtitle">Cuando hay tiempo de verdad en casa</span>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="section-note"><p><strong>¿Por qué te pregunto esto?</strong> El fin de semana es cuando el hogar se usa a plena capacidad. Muchos espacios que parecen bien entre semana colapsan el sábado.</p></div>
+    <div class="question">
+      <label>Describe un sábado típico en casa *</label>
+      <textarea id="fin-semana" placeholder="El sábado me levanto a... desayunamos en... por la tarde... en la noche..."></textarea>
+    </div>
+    <div class="q-divider"></div>
+    <div class="question">
+      <label>¿Hacen deporte? ¿Qué equipos entran a la casa?</label>
+      <div class="options-grid" id="deporte-opts">
+        <label class="option-item"><input type="checkbox" value="Gym externo"> Gym externo, no afecta</label>
+        <label class="option-item"><input type="checkbox" value="Ejercicio en casa"> Ejercicio en casa</label>
+        <label class="option-item"><input type="checkbox" value="Bicicleta"> Bicicleta que entra</label>
+        <label class="option-item"><input type="checkbox" value="Equipos voluminosos"> Equipos voluminosos</label>
+        <label class="option-item"><input type="checkbox" value="Camping"> Equipo de camping</label>
+        <label class="option-item"><input type="checkbox" value="Raquetas/palos"> Raquetas / palos de golf</label>
+        <label class="option-item"><input type="checkbox" value="No deporte"> No hago deporte</label>
+      </div>
+      <textarea id="deporte-detalle" style="margin-top:10px;" placeholder="¿Dónde guardás ese equipo? ¿Qué tan grande es cada elemento?"></textarea>
+    </div>
+    <div class="q-divider"></div>
+    <div class="question">
+      <label>¿Tienen balcón o terraza? ¿Cómo la usan?</label>
+      <div class="options-grid" id="balcon-opts">
+        <label class="option-item"><input type="radio" name="balcon" value="No tenemos"> No tenemos</label>
+        <label class="option-item"><input type="radio" name="balcon" value="No la aprovechamos"> Tenemos pero no la aprovechamos</label>
+        <label class="option-item"><input type="radio" name="balcon" value="Tender ropa"> Para tender ropa</label>
+        <label class="option-item"><input type="radio" name="balcon" value="Plantas"> Zona de plantas</label>
+        <label class="option-item"><input type="radio" name="balcon" value="Descanso"> Zona de descanso</label>
+        <label class="option-item"><input type="radio" name="balcon" value="Desayuno/bebidas"> Desayunamos allí</label>
+      </div>
+      <textarea id="balcon-detalle" style="margin-top:10px;" placeholder="¿Qué te gustaría tener ahí? ¿Muebles? ¿Plantas? ¿Parrilla?"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- S9 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">9</div>
+    <div>
+      <span class="section-title">Todo lo que necesita un lugar</span>
+      <span class="section-subtitle">Almacenamiento real para la vida real</span>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="section-note"><p><strong>¿Por qué te pregunto esto?</strong> El almacenamiento es el talón de Aquiles del diseño. Todo lo que existe en tu vida necesita un lugar donde vivir en el hogar.</p></div>
+
+    <div class="subsection">
+      <div class="subsection-title">Tecnología</div>
+      <div class="question">
+        <label>¿Qué equipos tecnológicos tienen en casa?</label>
+        <div class="options-grid" id="tecnologia-opts">
+          <label class="option-item"><input type="checkbox" value="Portátil (1)"> Portátil (1)</label>
+          <label class="option-item"><input type="checkbox" value="Portátiles (2+)"> Portátiles (2+)</label>
+          <label class="option-item"><input type="checkbox" value="PC escritorio"> PC de escritorio</label>
+          <label class="option-item"><input type="checkbox" value="Monitor externo"> Monitor externo</label>
+          <label class="option-item"><input type="checkbox" value="Impresora"> Impresora</label>
+          <label class="option-item"><input type="checkbox" value="Cámara"> Cámara fotográfica</label>
+          <label class="option-item"><input type="checkbox" value="Dron"> Dron</label>
+          <label class="option-item"><input type="checkbox" value="Consola"> Consola de videojuegos</label>
+        </div>
+        <textarea id="tecnologia-detalle" style="margin-top:10px;" placeholder="¿Dónde guardás cables y cargadores? ¿Tenés muchos gadgets que cargan a diario?"></textarea>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Libros y colecciones</div>
+      <div class="question">
+        <label>¿Tienen libros, obras de arte o colecciones?</label>
+        <div class="options-grid" id="colecciones-opts">
+          <label class="option-item"><input type="checkbox" value="Pocos libros"> Pocos libros</label>
+          <label class="option-item"><input type="checkbox" value="Biblioteca mediana"> Biblioteca mediana (50-150)</label>
+          <label class="option-item"><input type="checkbox" value="Biblioteca grande"> Biblioteca grande (+150)</label>
+          <label class="option-item"><input type="checkbox" value="Vinilos"> Colección de vinilos</label>
+          <label class="option-item"><input type="checkbox" value="Arte"> Obras de arte</label>
+          <label class="option-item"><input type="checkbox" value="Vinos"> Colección de vinos</label>
+          <label class="option-item"><input type="checkbox" value="Plantas"> Plantas en cantidad</label>
+        </div>
+        <textarea id="colecciones-detalle" style="margin-top:10px;" placeholder="¿Qué colecciones tenés y cómo te gustaría exhibirlas o guardarlas?"></textarea>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Limpieza y lavado</div>
+      <div class="question">
+        <label>¿Qué equipos de limpieza tienen?</label>
+        <div class="options-grid" id="limpieza-opts">
+          <label class="option-item"><input type="checkbox" value="Escoba/trapero"> Escoba, trapero</label>
+          <label class="option-item"><input type="checkbox" value="Aspiradora"> Aspiradora</label>
+          <label class="option-item"><input type="checkbox" value="Robot aspirador"> Robot aspirador</label>
+          <label class="option-item"><input type="checkbox" value="Caja herramientas"> Caja de herramientas</label>
+          <label class="option-item"><input type="checkbox" value="Escalera"> Escalera pequeña</label>
+          <label class="option-item"><input type="checkbox" value="Jardinería"> Artículos de jardinería</label>
+        </div>
+      </div>
+      <div class="question" style="margin-top:16px;">
+        <label>¿Con qué frecuencia laváis la ropa y cómo funciona esa zona? *</label>
+        <div class="options-grid" id="lavado-opts">
+          <label class="option-item"><input type="radio" name="lavado" value="Todos los días"> Todos los días</label>
+          <label class="option-item"><input type="radio" name="lavado" value="Cada 2-3 días"> Cada 2-3 días</label>
+          <label class="option-item"><input type="radio" name="lavado" value="Una vez/semana"> Una vez/semana</label>
+          <label class="option-item"><input type="radio" name="lavado" value="La empleada"> La empleada se encarga</label>
+          <label class="option-item"><input type="radio" name="lavado" value="Lavandería externa"> Lo llevamos a lavandería</label>
+        </div>
+        <textarea id="lavado-detalle" style="margin-top:10px;" placeholder="¿Tienen lavadora y secadora? ¿Tienden en el balcón? ¿Cuánta ropa lavan de una vez?"></textarea>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Otros elementos</div>
+      <div class="question">
+        <label>¿Qué más hay en tu vida que necesite espacio en el hogar?</label>
+        <div class="options-grid" id="otros-opts">
+          <label class="option-item"><input type="checkbox" value="Maletas"> Maletas de viaje</label>
+          <label class="option-item"><input type="checkbox" value="Medicamentos"> Medicamentos / botiquín</label>
+          <label class="option-item"><input type="checkbox" value="Documentos"> Archivo físico / documentos</label>
+          <label class="option-item"><input type="checkbox" value="Bolsas"> Bolsas reutilizables</label>
+          <label class="option-item"><input type="checkbox" value="Carro"> Artículos para el carro</label>
+          <label class="option-item"><input type="checkbox" value="Bebé/niños"> Artículos de niños</label>
+          <label class="option-item"><input type="checkbox" value="Camping"> Camping / senderismo</label>
+          <label class="option-item"><input type="checkbox" value="Papelería"> Papelería / útiles</label>
+          <label class="option-item"><input type="checkbox" value="Navidad"> Artículos de temporada</label>
+        </div>
+        <textarea id="otros-detalle" style="margin-top:10px;" placeholder="¿Hay algo más? ¿Qué elementos no tienen hoy un lugar definido en la casa?"></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S10 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">10</div>
+    <div>
+      <span class="section-title">El hogar que sueñas</span>
+      <span class="section-subtitle">Lo que no querés que quede sin decir</span>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="section-note"><p><strong>Última sección.</strong> Aquí podés decirme todo lo que no encajó antes — frustraciones, deseos, referencias, cosas que juraste que tendrías en tu próximo hogar.</p></div>
+    <div class="question">
+      <label>¿Qué es lo que más te molesta de tu hogar actual?</label>
+      <textarea id="frustraciones" placeholder="El baño es muy pequeño / nunca encuentro nada / la cocina no tiene almacenamiento..."></textarea>
+    </div>
+    <div class="q-divider"></div>
+    <div class="question">
+      <label>¿Hay algún espacio que sueñes con tener?</label>
+      <textarea id="suenos" placeholder="Siempre quise un rincón de lectura / una isla en la cocina / un vestier de verdad / una zona de trabajo separada..."></textarea>
+    </div>
+    <div class="q-divider"></div>
+    <div class="question">
+      <label>¿Algo más que quieras contarme sobre tu manera de vivir?</label>
+      <textarea id="extra" placeholder="Cualquier cosa que no haya preguntado y que creas que es importante para diseñar tu hogar..."></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- SUBMIT -->
+<div class="submit-section">
+  <h3>¡Gracias por tu tiempo!</h3>
+  <p>Tus respuestas me ayudan a diseñar un hogar que realmente te pertenezca.<br>Las recibiré en los próximos minutos.</p>
+  <button class="btn-submit" id="btn-enviar" onclick="enviarFormulario()">Enviar cuestionario</button>
+</div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function getChecked(containerOrName, type) {
+  if (type === 'radio') {
+    const el = document.querySelector(`input[name="${containerOrName}"]:checked`);
+    return el ? el.value : '';
+  }
+  if (type === 'checkbox') {
+    const container = document.getElementById(containerOrName);
+    if (!container) return '';
+    return Array.from(container.querySelectorAll('input[type="checkbox"]:checked')).map(e => e.value).join(', ');
+  }
+}
+
+function val(id) {
+  const el = document.getElementById(id);
+  return el ? el.value.trim() : '';
+}
+
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isError ? ' error' : '');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 5000);
+}
+
+async function enviarFormulario() {
+  const nombre = val('nombre');
+  if (!nombre) { showToast('Por favor ingresá tu nombre.', true); return; }
+
+  const btn = document.getElementById('btn-enviar');
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+
+  const data = {
+    nombre,
+    email: val('email'),
+    habitantes: val('habitantes'),
+    empleada: getChecked('empleada', 'radio'),
+    mascotas: getChecked('mascotas-opts', 'checkbox') + ' | ' + val('mascotas-detalle'),
+    rutina_manana: [val('despertar'), getChecked('primeros5-opts','checkbox')].filter(Boolean).join(' | '),
+    rutina_bano: [val('bano1'), val('bano2'), val('bano3'), val('bano4')].filter(Boolean).join(' → '),
+    productos_bano: getChecked('prod_bano', 'radio'),
+    bano_compartido: val('bano-compartido'),
+    vestirse: [val('vestir1'), val('vestir2'), val('vestir3')].filter(Boolean).join(' → '),
+    plancha: getChecked('plancha', 'radio'),
+    desayuno: getChecked('desayuno', 'radio') + ' | ' + val('desayuno-detalle'),
+    al_salir: [val('salir1'), val('salir2'), val('salir3')].filter(Boolean).join(' → '),
+    objetos_perdidos: getChecked('objetos-opts', 'checkbox'),
+    llegada_casa: [val('llegada1'), val('llegada2'), val('llegada3'), val('llegada4')].filter(Boolean).join(' → '),
+    cosas_llegada: getChecked('cosas-llegada-opts', 'checkbox'),
+    almuerzo: getChecked('almuerzo', 'radio'),
+    rutina_almuerzo: [val('alm1'), val('alm2'), val('alm3')].filter(Boolean).join(' → '),
+    cocina_frecuencia: getChecked('cocina_freq', 'radio') + ' | ' + val('cocina-quien'),
+    tipo_cocina: getChecked('tipo-cocina-opts', 'checkbox'),
+    bebidas: getChecked('bebidas-opts', 'checkbox') + ' | ' + val('bebidas-detalle'),
+    electro_diarios: getChecked('electro-opts', 'checkbox'),
+    cocina_problemas: val('cocina-problemas'),
+    tiempo_libre: getChecked('tiempo-libre-opts', 'checkbox') + ' | ' + val('tiempo-libre-detalle'),
+    planes_pareja: getChecked('planes-pareja-opts', 'checkbox') + ' | ' + val('planes-pareja-detalle'),
+    visitas_frecuencia: getChecked('visitas', 'radio'),
+    planes_visitas: val('visitas-detalle') + ' | ' + getChecked('planes-visitas-opts', 'checkbox'),
+    teletrabajo: getChecked('teletrabajo', 'radio') + ' | ' + val('teletrabajo-detalle'),
+    hobbies: getChecked('hobbies-opts', 'checkbox') + ' | ' + val('hobbies-detalle'),
+    ritual_noche: val('ritual-noche'),
+    tardes: val('tardes'),
+    uso_habitacion: getChecked('habitacion-opts', 'checkbox') + ' | ' + val('habitacion-detalle'),
+    ropa_colgada: val('ropa-colgada'),
+    ropa_doblada: val('ropa-doblada'),
+    zapatos: val('zapatos'),
+    bolsos: val('bolsos'),
+    ropa_especial: getChecked('ropa-especial-opts', 'checkbox'),
+    fin_semana: val('fin-semana'),
+    deporte: getChecked('deporte-opts', 'checkbox') + ' | ' + val('deporte-detalle'),
+    balcon: getChecked('balcon', 'radio') + ' | ' + val('balcon-detalle'),
+    tecnologia: getChecked('tecnologia-opts', 'checkbox') + ' | ' + val('tecnologia-detalle'),
+    colecciones: getChecked('colecciones-opts', 'checkbox') + ' | ' + val('colecciones-detalle'),
+    limpieza: getChecked('limpieza-opts', 'checkbox'),
+    lavado: getChecked('lavado', 'radio') + ' | ' + val('lavado-detalle'),
+    otros_almacenamiento: getChecked('otros-opts', 'checkbox') + ' | ' + val('otros-detalle'),
+    frustraciones: val('frustraciones') + ' | Sueños: ' + val('suenos') + ' | Extra: ' + val('extra')
+  };
+
+  try {
+    const res = await fetch('/.netlify/functions/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    if (res.ok) {
+      showToast('✓ Cuestionario enviado exitosamente. ¡Gracias!', false);
+      btn.textContent = '¡Enviado con éxito!';
+      btn.style.background = '#5a8a5a';
+      btn.style.color = '#fff';
+    } else {
+      const txt = await res.text();
+      showToast('Error al enviar: ' + txt, true);
+      btn.disabled = false;
+      btn.textContent = 'Enviar cuestionario';
+    }
+  } catch (err) {
+    showToast('Error de conexión. Revisá tu internet.', true);
+    btn.disabled = false;
+    btn.textContent = 'Enviar cuestionario';
+  }
+}
+</script>
+</body>
+</html>
