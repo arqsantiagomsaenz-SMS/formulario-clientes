@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Programa Arquitectónico — Martinez & Melo</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --negro: #1A1A1A; --dorado: #8B6914; --dorado-claro: #B8962E;
+    --crema: #E8E2D9; --crema-suave: #F2EEE8; --blanco: #FAFAF8;
+    --muted: #7A7570; --border: #D4CEC5; --note-bg: #F5F0E6; --note-border: #C8B87A;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--crema); font-family:'DM Sans',sans-serif; color:var(--negro); }
+
+  .header { background:var(--negro); color:var(--crema); padding:56px 40px 48px; position:relative; overflow:hidden; }
+  .header::before { content:''; position:absolute; top:-60px; right:-60px; width:320px; height:320px; border:1px solid rgba(184,150,46,0.15); border-radius:50%; pointer-events:none; }
+  .header-inner { max-width:880px; margin:0 auto; position:relative; z-index:1; }
+  .logo-wrap { margin-bottom:36px; }
+  .logo-svg { width:260px; height:auto; }
+  .header-tag { display:inline-block; font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--dorado-claro); border:1px solid rgba(184,150,46,0.4); padding:5px 12px; margin-bottom:20px; }
+  .header h1 { font-family:'Cormorant Garamond',serif; font-size:clamp(30px,5vw,50px); font-weight:300; line-height:1.1; margin-bottom:18px; color:var(--crema); }
+  .header h1 em { font-style:italic; color:var(--dorado-claro); }
+  .header p { font-size:14px; line-height:1.85; color:rgba(232,226,217,0.72); max-width:580px; font-weight:300; }
+  .header-divider { width:48px; height:1px; background:var(--dorado); margin:28px 0; }
+
+  .main { max-width:880px; margin:0 auto; padding:0 20px 80px; }
+  .section { background:var(--blanco); border:1px solid var(--border); margin-top:28px; overflow:hidden; transition:box-shadow 0.3s; }
+  .section:hover { box-shadow:0 6px 32px rgba(139,105,20,0.08); }
+  .section-header { padding:26px 36px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:18px; background:var(--crema-suave); }
+  .section-number { width:38px; height:38px; background:var(--negro); color:var(--crema); font-family:'Cormorant Garamond',serif; font-size:17px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .section-title { font-family:'Cormorant Garamond',serif; font-size:21px; font-weight:400; display:block; }
+  .section-subtitle { font-size:11px; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-top:3px; display:block; }
+  .section-note { background:var(--note-bg); border-left:3px solid var(--dorado); padding:14px 18px; margin:0 36px 26px; }
+  .section-note p { font-size:13px; color:var(--dorado); line-height:1.7; font-style:italic; }
+  .section-note strong { font-style:normal; color:var(--negro); font-weight:500; }
+  .section-body { padding:30px 36px; }
+
+  .question { margin-bottom:26px; }
+  .question:last-child { margin-bottom:0; }
+  .question label { display:block; font-size:14px; font-weight:500; margin-bottom:6px; line-height:1.5; }
+  .q-note { background:var(--note-bg); border:1px solid var(--note-border); padding:10px 14px; margin-bottom:10px; font-size:12px; color:var(--dorado); line-height:1.7; font-style:italic; }
+  .q-note strong { font-style:normal; color:var(--negro); font-weight:500; }
+
+  input[type="text"], input[type="email"], input[type="number"], select, textarea {
+    width:100%; border:1px solid var(--border); padding:11px 15px;
+    font-family:'DM Sans',sans-serif; font-size:14px; color:var(--negro);
+    background:var(--crema-suave); outline:none; -webkit-appearance:none; border-radius:1px;
+    transition:border-color 0.2s, background 0.2s;
+  }
+  input:focus, select:focus, textarea:focus { border-color:var(--dorado); background:#fff; }
+  textarea { min-height:88px; resize:vertical; line-height:1.7; }
+  select { cursor:pointer; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238B6914' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 14px center; padding-right:38px; }
+
+  .options-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:8px; margin-top:4px; }
+  .option-item { display:flex; align-items:center; gap:10px; padding:10px 14px; border:1px solid var(--border); cursor:pointer; background:var(--crema-suave); font-size:13px; line-height:1.4; transition:all 0.2s; }
+  .option-item:hover { border-color:var(--dorado); background:#fff; }
+  .option-item input { width:15px; height:15px; accent-color:var(--dorado); cursor:pointer; flex-shrink:0; }
+
+  .q-divider { height:1px; background:var(--border); margin:26px 0; opacity:0.6; }
+  .row-2 { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  .row-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; }
+  .subsection { background:var(--crema-suave); border:1px solid var(--border); padding:22px; margin-bottom:22px; }
+  .subsection-title { font-family:'Cormorant Garamond',serif; font-size:16px; color:var(--dorado); margin-bottom:14px; display:flex; align-items:center; gap:10px; }
+  .subsection-title::before { content:''; width:18px; height:1px; background:var(--dorado-claro); }
+
+  .areas-table { width:100%; border-collapse:collapse; margin-top:8px; }
+  .areas-table th { background:var(--negro); color:var(--crema); font-size:12px; font-weight:500; letter-spacing:1px; text-transform:uppercase; padding:10px 12px; text-align:left; }
+  .areas-table td { padding:6px 4px; border-bottom:1px solid var(--border); }
+  .areas-table td input { border:1px solid var(--border); padding:8px 10px; font-size:13px; background:var(--crema-suave); }
+  .btn-add-row { margin-top:10px; background:none; border:1px dashed var(--dorado); color:var(--dorado); padding:8px 16px; font-family:'DM Sans',sans-serif; font-size:12px; letter-spacing:1px; text-transform:uppercase; cursor:pointer; transition:all 0.2s; }
+  .btn-add-row:hover { background:var(--note-bg); }
+
+  .submit-section { background:var(--negro); padding:48px 36px; margin-top:28px; text-align:center; position:relative; overflow:hidden; }
+  .submit-section::before { content:''; position:absolute; top:-50px; right:-50px; width:180px; height:180px; border:1px solid rgba(184,150,46,0.15); border-radius:50%; }
+  .submit-section h3 { font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:300; color:var(--crema); margin-bottom:10px; }
+  .submit-section p { font-size:13px; color:rgba(232,226,217,0.6); margin-bottom:30px; }
+  .btn-submit { background:var(--dorado); color:#fff; font-family:'DM Sans',sans-serif; font-size:12px; font-weight:500; letter-spacing:2.5px; text-transform:uppercase; padding:15px 48px; border:none; cursor:pointer; transition:all 0.3s; position:relative; z-index:1; }
+  .btn-submit:hover { background:var(--dorado-claro); transform:translateY(-2px); }
+  .btn-submit:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+
+  .footer { text-align:center; padding:24px; font-size:11px; color:var(--muted); letter-spacing:1px; }
+  .toast { position:fixed; bottom:28px; right:28px; background:var(--negro); color:var(--crema); padding:14px 22px; font-size:13px; border-left:3px solid var(--dorado); transform:translateX(120%); transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1); z-index:1000; max-width:300px; }
+  .toast.show { transform:translateX(0); }
+  .toast.error { border-left-color:#c0392b; }
+
+  @media(max-width:640px) {
+    .row-2, .row-3 { grid-template-columns:1fr; }
+    .section-body, .section-header { padding:18px; }
+    .section-note { margin:0 18px 18px; }
+    .options-grid { grid-template-columns:1fr; }
+    .header { padding:36px 20px; }
+    .logo-svg { width:200px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="logo-wrap">
+      <svg class="logo-svg" viewBox="0 0 420 90" xmlns="http://www.w3.org/2000/svg">
+        <g fill="#E8E2D9">
+          <polygon points="4,74 14,74 28,22 18,22"/>
+          <polygon points="28,74 38,74 52,22 42,22"/>
+          <rect x="56" y="16" width="4" height="58"/>
+          <polygon points="64,22 74,22 88,74 78,74"/>
+          <polygon points="84,22 94,22 108,74 98,74"/>
+        </g>
+        <text x="126" y="38" font-family="Cormorant Garamond, serif" font-size="28" font-weight="400" fill="#E8E2D9" letter-spacing="2">MARTINEZ &amp; MELO</text>
+        <text x="128" y="56" font-family="Cormorant Garamond, serif" font-size="14" font-style="italic" fill="#B8962E">Architecture &amp; Engineer</text>
+        <text x="128" y="71" font-family="Cormorant Garamond, serif" font-size="14" font-style="italic" fill="#B8962E">Interior Design</text>
+        <text x="128" y="86" font-family="Cormorant Garamond, serif" font-size="14" font-style="italic" fill="#B8962E">Energy Improv</text>
+      </svg>
+    </div>
+    <div class="header-tag">Levantamiento de Información · Programa Arquitectónico</div>
+    <h1>Cuéntanos cómo <em>funciona</em><br>tu organización</h1>
+    <p>Este cuestionario nos permite entender la estructura, los flujos de trabajo y las necesidades reales de cada área, para diseñar un programa arquitectónico que responda con precisión a cómo opera tu empresa.</p>
+    <div class="header-divider"></div>
+    <p style="font-size:12px;">Entre más detallado seas, más preciso será el programa arquitectónico.</p>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- S1 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">1</div>
+    <div>
+      <span class="section-title">Identificación de la organización</span>
+      <span class="section-subtitle">Datos generales de la empresa o entidad</span>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="section-note"><p><strong>¿Por qué te preguntamos esto?</strong> Conocer el sector, tamaño y tipo de organización nos permite dimensionar correctamente el programa y anticipar requerimientos normativos específicos.</p></div>
+    <div class="row-2">
+      <div class="question"><label>Nombre de la empresa u organización *</label><input type="text" id="empresa-nombre" placeholder="Nombre completo o razón social"></div>
+      <div class="question"><label>Nombre del contacto principal *</label><input type="text" id="contacto-nombre" placeholder="Nombre y cargo"></div>
+    </div>
+    <div class="row-2" style="margin-top:16px;">
+      <div class="question"><label>Correo electrónico</label><input type="email" id="contacto-email" placeholder="correo@empresa.com"></div>
+      <div class="question"><label>Teléfono</label><input type="text" id="contacto-tel" placeholder="+57 ..."></div>
+    </div>
+    <div class="q-divider"></div>
+    <div class="question">
+      <label>Sector o industria *</label>
+      <div class="options-grid" id="sector-opts">
+        <label class="option-item"><input type="radio" name="sector" value="Salud"> Salud</label>
+        <label class="option-item"><input type="radio" name="sector" value="Educación"> Educación</label>
+        <label class="option-item"><input type="radio" name="sector" value="Tecnología"> Tecnología</label>
+        <label class="option-item"><input type="radio" name="sector" value="Gobierno / público"> Gobierno / público</label>
+        <label class="option-item"><input type="radio" name="sector" value="Financiero"> Financiero</label>
+        <label class="option-item"><input type="radio" name="sector" value="Retail / comercio"> Retail / comercio</label>
+        <label class="option-item"><input type="radio" name="sector" value="Industria / manufactura"> Industria / manufactura</label>
+        <label class="option-item"><input type="radio" name="sector" value="Servicios profesionales"> Servicios profesionales</label>
+        <label class="option-item"><input type="radio" name="sector" value="ONG / fundación"> ONG / fundación</label>
+        <label class="option-item"><input type="radio" name="sector" value="Otro"> Otro</label>
+      </div>
+      <input type="text" id="sector-otro" style="margin-top:8px;" placeholder="Si es otro, especifica el sector">
+    </div>
+    <div class="q-divider"></div>
+    <div class="row-2">
+      <div class="question">
+        <label>Tipo de organización *</label>
+        <select id="tipo-org">
+          <option value="">Selecciona</option>
+          <option>Empresa privada</option>
+          <option>Entidad pública</option>
+          <option>Empresa mixta</option>
+          <option>ONG / fundación</option>
+          <option>Cooperativa</option>
+          <option>Startup / emprendimiento</option>
+        </select>
+      </div>
+      <div class="question">
+        <label>Número total de empleados actuales *</label>
+        <input type="number" id="num-empleados" placeholder="Ej: 120" min="1">
+      </div>
+    </div>
+    <div class="row-2" style="margin-top:16px;">
+      <div class="question">
+        <label>Proyección de crecimiento a 5 años</label>
+        <div class="q-note"><strong>Nota:</strong> Nos permite prever flexibilidad y capacidad de expansión.</div>
+        <input type="text" id="crecimiento" placeholder="Ej: 30% más / 50 personas adicionales">
+      </div>
+      <div class="question">
+        <label>Ciudad y tipo de proyecto *</label>
+        <input type="text" id="ciudad" placeholder="Ciudad" style="margin-bottom:8px;">
+        <select id="tipo-inmueble">
+          <option value="">Tipo de proyecto</option>
+          <option>Obra nueva (edificio propio)</option>
+          <option>Remodelación de sede existente</option>
+          <option>Adecuación de espacio arrendado</option>
+          <option>Ampliación de instalaciones</option>
+          <option>Aún no está definido</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S2 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">2</div>
+    <div>
+      <span class="section-title">Estructura organizacional</span>
+      <span class="section-subtitle">Jerarquía, áreas y departamentos</span>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="section-note"><p><strong>¿Por qué te preguntamos esto?</strong> La estructura jerárquica y la relación entre áreas define la proximidad espacial necesaria, los flujos de circulación y la configuración general del programa.</p></div>
+    <div class="row-2">
+      <div class="question">
+        <label>¿Cuántas áreas o departamentos tiene la organización? *</label>
+        <input type="number" id="num-areas" placeholder="Ej: 8" min="1">
+      </div>
+      <div class="question">
+        <label>Niveles jerárquicos existentes *</label>
+        <div class="options-grid" id="jerarquia-opts">
+          <label class="option-item"><input type="checkbox" value="Directivo / junta"> Directivo / junta</label>
+          <label class="option-item"><input type="checkbox" value="Gerencial"> Gerencial</label>
+          <label class="option-item"><input type="checkbox" value="Jefes de área"> Jefes de área</label>
+          <label class="option-item"><input type="checkbox" value="Profesional / técnico"> Profesional / técnico</label>
+          <label class="option-item"><input type="checkbox" value="Operativo / asistencial"> Operativo / asistencial</label>
+          <label class="option-item"><input type="checkbox" value="Externo / contratista"> Externo / contratista</label>
+        </div>
+      </div>
+    </div>
+    <div class="q-divider"></div>
+    <div class="question">
+      <label>Listado de áreas de la organización *</label>
+      <div class="q-note"><strong>Nota:</strong> Registra cada área con su nombre, número de personas y responsable. Esta tabla es la base del programa arquitectónico.</div>
+      <table class="areas-table">
+        <thead><tr><th style="width:35%">Nombre del área</th><th style="width:20%">N.° personas</th><th style="width:45%">Jefe / responsable</th></tr></thead>
+        <tbody id="areas-tbody">
+          <tr><td><input type="text" placeholder="Ej: Gerencia General"></td><td><input type="number" placeholder="0" min="0"></td><td><input type="text" placeholder="Nombre y cargo"></td></tr>
+          <tr><td><input type="text" placeholder="Ej: Recursos Humanos"></td><td><input type="number" placeholder="0" min="0"></td><td><input type="text" placeholder="Nombre y cargo"></td></tr>
+          <tr><td><input type="text" placeholder="Ej: Contabilidad / Finanzas"></td><td><input type="number" placeholder="0" min="0"></td><td><input type="text" placeholder="Nombre y cargo"></td></tr>
+          <tr><td><input type="text" placeholder="Ej: Tecnología / Sistemas"></td><td><input type="number" placeholder="0" min="0"></td><td><input type="text" placeholder="Nombre y cargo"></td></tr>
+          <tr><td><input type="text" placeholder="Ej: Comercial / Ventas"></td><td><input type="number" placeholder="0" min="0"></td><td><input type="text" placeholder="Nombre y cargo"></td></tr>
+        </tbody>
+      </table>
+      <button class="btn-add-row" onclick="addRow()">+ Agregar área</button>
+    </div>
+    <div class="q-divider"></div>
+    <div class="question">
+      <label>¿Cómo es la colaboración entre áreas?</label>
+      <div class="options-grid" id="colaboracion-opts">
+        <label class="option-item"><input type="radio" name="colaboracion" value="Trabajo muy independiente"> Trabajo muy independiente</label>
+        <label class="option-item"><input type="radio" name="colaboracion" value="Colaboración moderada"> Colaboración moderada</label>
+        <label class="option-item"><input type="radio" name="colaboracion" value="Alta colaboración"> Alta colaboración</label>
+        <label class="option-item"><input type="radio" name="colaboracion" value="Modelo matricial"> Modelo matricial / proyectos</label>
+      </div>
+      <textarea id="colaboracion-detalle" style="margin-top:10px;" placeholder="¿Qué áreas trabajan más juntas? ¿Cuáles son más independientes?"></textarea>
+    </div>
+    <div class="question">
+      <label>¿Existe personal externo, contratistas o visitantes frecuentes?</label>
+      <div class="options-grid" id="externos-opts">
+        <label class="option-item"><input type="radio" name="externos" value="No"> No</label>
+        <label class="option-item"><input type="radio" name="externos" value="Sí, contratistas"> Sí, contratistas</label>
+        <label class="option-item"><input type="radio" name="externos" value="Sí, visitantes frecuentes"> Sí, visitantes frecuentes</label>
+        <label class="option-item"><input type="radio" name="externos" value="Sí, ambos"> Sí, ambos</label>
+      </div>
+      <textarea id="externos-detalle" style="margin-top:10px;" placeholder="¿Cuántos? ¿Con qué frecuencia? ¿Necesitan espacios asignados?"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- S3 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">3</div>
+    <div>
+      <span class="section-title">Perfil de cada área</span>
+      <span class="section-subtitle">Necesidades espaciales por departamento</span>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="section-note"><p><strong>¿Por qué te preguntamos esto?</strong> Cada área tiene necesidades espaciales distintas. Esta sección define el tipo de espacio, equipamiento y requerimientos técnicos para construir el programa detallado.</p></div>
+    <div class="subsection">
+      <div class="subsection-title">Tipo de trabajo y privacidad</div>
+      <div class="question">
+        <label>¿Qué tipo de trabajo predomina en la organización? *</label>
+        <div class="options-grid" id="tipo-trabajo-opts">
+          <label class="option-item"><input type="checkbox" value="Individual concentrado"> Individual concentrado</label>
+          <label class="option-item"><input type="checkbox" value="Colaborativo en equipo"> Colaborativo en equipo</label>
+          <label class="option-item"><input type="checkbox" value="Atención al público"> Atención al público</label>
+          <label class="option-item"><input type="checkbox" value="Operativo / producción"> Operativo / producción</label>
+          <label class="option-item"><input type="checkbox" value="Campo + oficina"> Campo + oficina</label>
+          <label class="option-item"><input type="checkbox" value="Gestión y dirección"> Gestión y dirección</label>
+        </div>
+      </div>
+      <div class="question" style="margin-top:16px;">
+        <label>¿Qué áreas requieren privacidad acústica o visual?</label>
+        <textarea id="privacidad-areas" placeholder="Ej: Gerencia, RRHH, Jurídica, salas de negociación..."></textarea>
+      </div>
+    </div>
+    <div class="subsection">
+      <div class="subsection-title">Puestos de trabajo</div>
+      <div class="question">
+        <label>¿Cuántos puestos de trabajo fijos se requieren en total? *</label>
+        <input type="number" id="puestos-fijos" placeholder="Número total de puestos fijos">
+      </div>
+      <div class="question" style="margin-top:16px;">
+        <label>¿Hay despachos u oficinas individuales para directivos o jefes?</label>
+        <div class="options-grid" id="despachos-opts">
+          <label class="option-item"><input type="radio" name="despachos" value="No, todos en open space"> No, todos en open space</label>
+          <label class="option-item"><input type="radio" name="despachos" value="Solo gerencia general"> Solo gerencia general</label>
+          <label class="option-item"><input type="radio" name="despachos" value="Varios despachos individuales"> Varios despachos</label>
+          <label class="option-item"><input type="radio" name="despachos" value="Oficinas por área"> Oficinas por área</label>
+        </div>
+        <textarea id="despachos-detalle" style="margin-top:10px;" placeholder="¿Cuántos despachos y para qué cargos?"></textarea>
+      </div>
+      <div class="question" style="margin-top:16px;">
+        <label>¿Qué equipos o mobiliario especial requiere algún área?</label>
+        <textarea id="mobiliario-especial" placeholder="Ej: mesas técnicas de gran formato, plotter, laboratorio, mostradores de atención..."></textarea>
+      </div>
+    </div>
+    <div class="subsection">
+      <div class="subsection-title">Archivo y documentación</div>
+      <div class="question">
+        <label>¿Qué áreas manejan documentación física voluminosa?</label>
+        <div class="options-grid" id="archivo-opts">
+          <label class="option-item"><input type="checkbox" value="Todo digital"> Todo digital</label>
+          <label class="option-item"><input type="checkbox" value="Archivo corriente moderado"> Archivo corriente moderado</label>
+          <label class="option-item"><input type="checkbox" value="Archivo muerto / histórico"> Archivo muerto / histórico</label>
+          <label class="option-item"><input type="checkbox" value="Expedientes por caso"> Expedientes por caso</label>
+          <label class="option-item"><input type="checkbox" value="Planos / gran formato"> Planos / gran formato</label>
+          <label class="option-item"><input type="checkbox" value="Muestras / catálogos"> Muestras / catálogos</label>
+        </div>
+        <textarea id="archivo-detalle" style="margin-top:10px;" placeholder="¿Cuánto volumen aproximado? ¿Necesita sala de archivo independiente?"></textarea>
+      </div>
+    </div>
+    <div class="subsection">
+      <div class="subsection-title">Equipos especiales y bodegas</div>
+      <div class="question">
+        <label>¿Algún área requiere maquinaria, equipos pesados o instalaciones especiales?</label>
+        <textarea id="equipos-especiales" placeholder="Ej: compresor, campana extractora, piso técnico, A/C dedicado..."></textarea>
+      </div>
+      <div class="question" style="margin-top:16px;">
+        <label>¿Qué áreas necesitan acceso a bodega o almacenamiento?</label>
+        <div class="options-grid" id="bodega-opts">
+          <label class="option-item"><input type="checkbox" value="Suministros de oficina"> Suministros de oficina</label>
+          <label class="option-item"><input type="checkbox" value="Mercancía / producto"> Mercancía / producto</label>
+          <label class="option-item"><input type="checkbox" value="Herramientas / taller"> Herramientas / taller</label>
+          <label class="option-item"><input type="checkbox" value="Equipos audiovisuales"> Equipos audiovisuales</label>
+          <label class="option-item"><input type="checkbox" value="Cuarto frío / especial"> Cuarto frío / especial</label>
+          <label class="option-item"><input type="checkbox" value="No requieren bodega"> No requieren bodega</label>
+        </div>
+        <textarea id="bodega-detalle" style="margin-top:10px;" placeholder="¿Cuántos m² necesita cada bodega? ¿Alguna requiere condiciones especiales?"></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S4 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">4</div>
+    <div>
+      <span class="section-title">Modelo de trabajo</span>
+      <span class="section-subtitle">Presencialidad, turnos y horarios</span>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="section-note"><p><strong>¿Por qué te preguntamos esto?</strong> El modelo de trabajo define cuántos puestos se necesitan simultáneamente, si aplica hot desking, y si hay zonas que operen en distintos horarios.</p></div>
+    <div class="question">
+      <label>¿En qué modalidad trabaja la organización? *</label>
+      <div class="options-grid" id="modalidad-opts">
+        <label class="option-item"><input type="radio" name="modalidad" value="100% presencial"> 100% presencial</label>
+        <label class="option-item"><input type="radio" name="modalidad" value="Híbrido"> Híbrido</label>
+        <label class="option-item"><input type="radio" name="modalidad" value="Mayoría remoto"> Mayoría remoto</label>
+        <label class="option-item"><input type="radio" name="modalidad" value="Varía por área"> Varía por área</label>
+      </div>
+      <textarea id="modalidad-detalle" style="margin-top:10px;" placeholder="¿Cuántos días viene cada área? ¿Hay días pico de asistencia?"></textarea>
+    </div>
+    <div class="q-divider"></div>
+    <div class="row-2">
+      <div class="question">
+        <label>¿Cuántos turnos de trabajo hay? *</label>
+        <select id="turnos">
+          <option value="">Selecciona</option>
+          <option>Un solo turno (8am - 6pm)</option>
+          <option>Dos turnos</option>
+          <option>Tres turnos</option>
+          <option>Operación 24h / 7 días</option>
+          <option>Horario flexible / por proyecto</option>
+        </select>
+      </div>
+      <div class="question">
+        <label>¿Qué porcentaje del personal es híbrido?</label>
+        <input type="number" id="pct-hibrido" placeholder="Ej: 40 (% del total)" min="0" max="100">
+      </div>
+    </div>
+    <div class="q-divider"></div>
+    <div class="question">
+      <label>¿Existen o se contemplan puestos compartidos (hot desking)?</label>
+      <div class="options-grid" id="hotdesk-opts">
+        <label class="option-item"><input type="radio" name="hotdesk" value="No, todos fijos"> No, todos fijos</label>
+        <label class="option-item"><input type="radio" name="hotdesk" value="Algunos compartidos"> Algunos compartidos</label>
+        <label class="option-item"><input type="radio" name="hotdesk" value="Mayoría hot desking"> Mayoría hot desking</label>
+        <label class="option-item"><input type="radio" name="hotdesk" value="Aún no definido"> Aún no definido</label>
+      </div>
+    </div>
+    <div class="question">
+      <label>¿Hay áreas que requieran operación continua o 24/7?</label>
+      <textarea id="operacion247" placeholder="Ej: Centro de monitoreo, call center nocturno, sala de control..."></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- S5 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">5</div>
+    <div>
+      <span class="section-title">Espacios de reunión y colaboración</span>
+      <span class="section-subtitle">Salas, auditorios y zonas de trabajo conjunto</span>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="section-note"><p><strong>¿Por qué te preguntamos esto?</strong> Los espacios de reunión son los más subutilizados o más escasos en toda organización. Dimensionarlos bien en cantidad, capacidad y equipamiento es clave para la eficiencia del programa.</p></div>
+    <div class="subsection">
+      <div class="subsection-title">Salas de reunión</div>
+      <div class="question">
+        <label>¿Cuántas salas de reunión necesitan y de qué capacidad? *</label>
+        <div class="row-3" style="margin-top:8px;">
+          <div class="question"><label style="font-size:12px;">Sala pequeña (2-4 personas)</label><input type="number" id="sala-pequena" placeholder="0" min="0"></div>
+          <div class="question"><label style="font-size:12px;">Sala mediana (5-10 personas)</label><input type="number" id="sala-mediana" placeholder="0" min="0"></div>
+          <div class="question"><label style="font-size:12px;">Sala grande (11-20 personas)</label><input type="number" id="sala-grande" placeholder="0" min="0"></div>
+        </div>
+      </div>
+      <div class="question" style="margin-top:16px;">
+        <label>¿Necesitan sala de juntas ejecutiva o boardroom?</label>
+        <div class="options-grid" id="boardroom-opts">
+          <label class="option-item"><input type="radio" name="boardroom" value="No"> No</label>
+          <label class="option-item"><input type="radio" name="boardroom" value="Sí, para directivos"> Sí, para directivos</label>
+          <label class="option-item"><input type="radio" name="boardroom" value="Sí, también para clientes"> Sí, también para clientes</label>
+        </div>
+        <textarea id="boardroom-detalle" style="margin-top:10px;" placeholder="¿Capacidad? ¿Equipamiento especial?"></textarea>
+      </div>
+      <div class="question" style="margin-top:16px;">
+        <label>¿Qué equipamiento deben tener las salas?</label>
+        <div class="options-grid" id="equip-salas-opts">
+          <label class="option-item"><input type="checkbox" value="Pantalla / proyector"> Pantalla / proyector</label>
+          <label class="option-item"><input type="checkbox" value="Videoconferencia"> Videoconferencia</label>
+          <label class="option-item"><input type="checkbox" value="Pizarra / whiteboard"> Pizarra / whiteboard</label>
+          <label class="option-item"><input type="checkbox" value="Sonido ambiental"> Sonido ambiental</label>
+          <label class="option-item"><input type="checkbox" value="Control de iluminación"> Control de iluminación</label>
+          <label class="option-item"><input type="checkbox" value="Puntos de carga"> Puntos de carga</label>
+        </div>
+      </div>
+    </div>
+    <div class="subsection">
+      <div class="subsection-title">Eventos y capacitaciones</div>
+      <div class="question">
+        <label>¿Realizan eventos, capacitaciones o asambleas internas?</label>
+        <div class="options-grid" id="eventos-opts">
+          <label class="option-item"><input type="radio" name="eventos" value="No"> No</label>
+          <label class="option-item"><input type="radio" name="eventos" value="Ocasionalmente (1-2 al año)"> Ocasionalmente</label>
+          <label class="option-item"><input type="radio" name="eventos" value="Mensualmente"> Mensualmente</label>
+          <label class="option-item"><input type="radio" name="eventos" value="Semanalmente"> Semanalmente</label>
+        </div>
+        <textarea id="eventos-detalle" style="margin-top:10px;" placeholder="¿Cuántas personas? ¿Solo internos o también externos? ¿Qué tipo?"></textarea>
+      </div>
+      <div class="question" style="margin-top:16px;">
+        <label>¿Necesitan auditorio o sala de capacitación?</label>
+        <div class="row-2">
+          <div><label style="font-size:12px; color:var(--muted);">Aforo necesario</label><input type="number" id="aforo-auditorio" placeholder="Ej: 80 personas" min="0"></div>
+          <div><label style="font-size:12px; color:var(--muted);">Tipo</label>
+            <select id="tipo-auditorio">
+              <option value="">Selecciona</option>
+              <option>No necesitan auditorio</option>
+              <option>Sala de capacitación (mesas + sillas)</option>
+              <option>Auditorio tipo teatro (sillas fijas)</option>
+              <option>Sala multiusos (configurable)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="question">
+      <label>¿Necesitan zonas de trabajo informal o colaboración espontánea?</label>
+      <div class="options-grid" id="informal-opts">
+        <label class="option-item"><input type="radio" name="informal" value="No es necesario"> No es necesario</label>
+        <label class="option-item"><input type="radio" name="informal" value="Sí, algunas zonas"> Sí, algunas zonas</label>
+        <label class="option-item"><input type="radio" name="informal" value="Sí, parte del modelo"> Sí, parte del modelo</label>
+      </div>
+      <textarea id="informal-detalle" style="margin-top:10px;" placeholder="¿Cuántas personas las usarían? ¿Qué tipo de mobiliario o atmósfera se busca?"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- S6 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">6</div>
+    <div>
+      <span class="section-title">Zonas de servicio y bienestar</span>
+      <span class="section-subtitle">Cafetería, descanso, baños y áreas comunes</span>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="section-note"><p><strong>¿Por qué te preguntamos esto?</strong> Las zonas de bienestar impactan directamente la productividad. Dimensionarlas correctamente evita cuellos de botella en horas pico y mejora la experiencia del empleado.</p></div>
+    <div class="subsection">
+      <div class="subsection-title">Alimentación</div>
+      <div class="question">
+        <label>¿Necesitan cafetería o comedor? *</label>
+        <div class="options-grid" id="cafeteria-opts">
+          <label class="option-item"><input type="radio" name="cafeteria" value="No"> No</label>
+          <label class="option-item"><input type="radio" name="cafeteria" value="Solo zona de café"> Solo zona de café</label>
+          <label class="option-item"><input type="radio" name="cafeteria" value="Comedor básico"> Comedor básico</label>
+          <label class="option-item"><input type="radio" name="cafeteria" value="Cafetería con cocina"> Cafetería con cocina</label>
+          <label class="option-item"><input type="radio" name="cafeteria" value="Restaurante interno"> Restaurante interno</label>
+        </div>
+        <input type="number" id="aforo-cafeteria" style="margin-top:8px;" placeholder="Aforo en horas pico (número de personas)">
+      </div>
+      <div class="question" style="margin-top:16px;">
+        <label>¿La cocina la opera personal propio o un concesionario?</label>
+        <div class="options-grid" id="cocina-op-opts">
+          <label class="option-item"><input type="radio" name="cocina-op" value="Personal propio"> Personal propio</label>
+          <label class="option-item"><input type="radio" name="cocina-op" value="Concesionario externo"> Concesionario externo</label>
+          <label class="option-item"><input type="radio" name="cocina-op" value="No aplica"> No aplica</label>
+        </div>
+      </div>
+    </div>
+    <div class="subsection">
+      <div class="subsection-title">Descanso y bienestar</div>
+      <div class="question">
+        <label>¿Necesitan zona de descanso o lounge para empleados?</label>
+        <div class="options-grid" id="lounge-opts">
+          <label class="option-item"><input type="radio" name="lounge" value="No"> No</label>
+          <label class="option-item"><input type="radio" name="lounge" value="Sí, básico"> Sí, básico</label>
+          <label class="option-item"><input type="radio" name="lounge" value="Sí, parte del bienestar"> Sí, parte del bienestar</label>
+        </div>
+        <textarea id="lounge-detalle" style="margin-top:10px;" placeholder="¿Qué elementos debe tener? ¿Sofás, TV, futbolín, zona de lectura?"></textarea>
+      </div>
+      <div class="question" style="margin-top:16px;">
+        <label>¿Requieren espacios especiales de bienestar?</label>
+        <div class="options-grid" id="bienestar-especial-opts">
+          <label class="option-item"><input type="checkbox" value="Sala de lactancia"> Sala de lactancia</label>
+          <label class="option-item"><input type="checkbox" value="Sala de oración"> Sala de oración</label>
+          <label class="option-item"><input type="checkbox" value="Gimnasio / ejercicio"> Gimnasio / ejercicio</label>
+          <label class="option-item"><input type="checkbox" value="Cancha deportiva"> Cancha deportiva</label>
+          <label class="option-item"><input type="checkbox" value="Guardería / zona infantil"> Guardería / zona infantil</label>
+          <label class="option-item"><input type="checkbox" value="Terraza / zona exterior"> Terraza / zona exterior</label>
+          <label class="option-item"><input type="checkbox" value="Ninguno"> Ninguno</label>
+        </div>
+      </div>
+    </div>
+    <div class="subsection">
+      <div class="subsection-title">Baños y vestieres</div>
+      <div class="question">
+        <label>¿Cuántos baños necesitan por zona o piso? *</label>
+        <textarea id="banos-detalle" placeholder="Ej: 2 baterías por piso (hombres/mujeres), 1 baño accesible por piso, baño visitantes en recepción..."></textarea>
+      </div>
+      <div class="question" style="margin-top:16px;">
+        <label>¿Requieren vestieres o duchas?</label>
+        <div class="options-grid" id="vestier-opts">
+          <label class="option-item"><input type="checkbox" value="Vestieres operarios"> Vestieres operarios</label>
+          <label class="option-item"><input type="checkbox" value="Duchas personal de campo"> Duchas personal campo</label>
+          <label class="option-item"><input type="checkbox" value="Vestieres ciclistas"> Vestieres ciclistas</label>
+          <label class="option-item"><input type="checkbox" value="No requieren"> No requieren</label>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S7 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">7</div>
+    <div>
+      <span class="section-title">Zonas técnicas y de soporte</span>
+      <span class="section-subtitle">TI, mantenimiento, seguridad y utilidades</span>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="section-note"><p><strong>¿Por qué te preguntamos esto?</strong> Las zonas técnicas son invisibles para el usuario pero críticas para el funcionamiento. Definirlas desde el programa evita costosas reubicaciones durante el diseño.</p></div>
+    <div class="row-2">
+      <div class="question">
+        <label>¿Necesitan cuarto de servidores o data center? *</label>
+        <div class="options-grid" id="servidores-opts">
+          <label class="option-item"><input type="radio" name="servidores" value="No, todo en la nube"> Todo en la nube</label>
+          <label class="option-item"><input type="radio" name="servidores" value="Cuarto de servidores pequeño"> Cuarto pequeño</label>
+          <label class="option-item"><input type="radio" name="servidores" value="Data center dedicado"> Data center dedicado</label>
+        </div>
+        <textarea id="servidores-detalle" style="margin-top:8px;" placeholder="¿Cuántos racks? ¿Requiere piso técnico, A/C dedicado, UPS propio?"></textarea>
+      </div>
+      <div class="question">
+        <label>¿Requieren cuarto eléctrico o planta eléctrica? *</label>
+        <div class="options-grid" id="electrico-opts">
+          <label class="option-item"><input type="checkbox" value="Cuarto eléctrico / tableros"> Cuarto eléctrico</label>
+          <label class="option-item"><input type="checkbox" value="UPS / respaldo"> UPS / respaldo</label>
+          <label class="option-item"><input type="checkbox" value="Planta eléctrica"> Planta eléctrica</label>
+          <label class="option-item"><input type="checkbox" value="Paneles solares"> Paneles solares</label>
+          <label class="option-item"><input type="checkbox" value="No aplica"> No aplica</label>
+        </div>
+      </div>
+    </div>
+    <div class="q-divider"></div>
+    <div class="question">
+      <label>¿Hay equipos de climatización o ventilación especiales?</label>
+      <textarea id="climatizacion" placeholder="Ej: sala limpia con presión positiva, A/C dedicado para servidores, extractores industriales..."></textarea>
+    </div>
+    <div class="q-divider"></div>
+    <div class="row-2">
+      <div class="question">
+        <label>¿Necesitan cuarto de aseo o bodega de mantenimiento?</label>
+        <div class="options-grid" id="aseo-opts">
+          <label class="option-item"><input type="radio" name="aseo" value="No"> No</label>
+          <label class="option-item"><input type="radio" name="aseo" value="Uno central"> Uno central</label>
+          <label class="option-item"><input type="radio" name="aseo" value="Uno por piso"> Uno por piso</label>
+        </div>
+      </div>
+      <div class="question">
+        <label>¿Requieren puesto de seguridad o control de acceso?</label>
+        <div class="options-grid" id="seguridad-opts">
+          <label class="option-item"><input type="checkbox" value="Portería"> Portería</label>
+          <label class="option-item"><input type="checkbox" value="Biométrico"> Biométrico</label>
+          <label class="option-item"><input type="checkbox" value="CCTV"> CCTV</label>
+          <label class="option-item"><input type="checkbox" value="Monitoreo 24h"> Monitoreo 24h</label>
+          <label class="option-item"><input type="checkbox" value="No requieren"> No requieren</label>
+        </div>
+      </div>
+    </div>
+    <div class="question">
+      <label>¿Manejan residuos especiales o peligrosos?</label>
+      <div class="options-grid" id="residuos-opts">
+        <label class="option-item"><input type="radio" name="residuos" value="No"> No</label>
+        <label class="option-item"><input type="radio" name="residuos" value="Laboratorio / químicos"> Laboratorio / químicos</label>
+        <label class="option-item"><input type="radio" name="residuos" value="Hospitalarios / biológicos"> Hospitalarios / biológicos</label>
+        <label class="option-item"><input type="radio" name="residuos" value="Industriales"> Industriales</label>
+        <label class="option-item"><input type="radio" name="residuos" value="Reciclaje estructurado"> Reciclaje estructurado</label>
+      </div>
+      <textarea id="residuos-detalle" style="margin-top:10px;" placeholder="¿Qué tipo de zona de acopio o manejo requieren?"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- S8 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">8</div>
+    <div>
+      <span class="section-title">Circulaciones y accesos</span>
+      <span class="section-subtitle">Flujos de personas, vehículos y mercancías</span>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="section-note"><p><strong>¿Por qué te preguntamos esto?</strong> Los flujos de circulación determinan la organización general del edificio. Definir qué flujos deben estar separados es el punto de partida del diseño de planta.</p></div>
+    <div class="question">
+      <label>¿Cuántos y qué tipos de accesos necesitan? *</label>
+      <div class="options-grid" id="accesos-opts">
+        <label class="option-item"><input type="checkbox" value="Peatonal empleados"> Peatonal empleados</label>
+        <label class="option-item"><input type="checkbox" value="Visitantes / público"> Visitantes / público</label>
+        <label class="option-item"><input type="checkbox" value="VIP / ejecutivo"> VIP / ejecutivo</label>
+        <label class="option-item"><input type="checkbox" value="Vehicular"> Vehicular</label>
+        <label class="option-item"><input type="checkbox" value="Carga y descarga"> Carga y descarga</label>
+        <label class="option-item"><input type="checkbox" value="Servicio / mantenimiento"> Servicio / mantenimiento</label>
+      </div>
+      <textarea id="accesos-detalle" style="margin-top:10px;" placeholder="¿Hay flujos que deben estar completamente separados? Ej: público vs. operativo, limpio vs. contaminado..."></textarea>
+    </div>
+    <div class="q-divider"></div>
+    <div class="subsection">
+      <div class="subsection-title">Parqueaderos</div>
+      <div class="question">
+        <label>¿Cuántos parqueaderos necesitan? *</label>
+        <div class="row-3">
+          <div class="question"><label style="font-size:12px;">Vehículos empleados</label><input type="number" id="parq-empleados" placeholder="0" min="0"></div>
+          <div class="question"><label style="font-size:12px;">Vehículos visitantes</label><input type="number" id="parq-visitantes" placeholder="0" min="0"></div>
+          <div class="question"><label style="font-size:12px;">Motos</label><input type="number" id="parq-motos" placeholder="0" min="0"></div>
+        </div>
+        <div class="row-3" style="margin-top:8px;">
+          <div class="question"><label style="font-size:12px;">Bicicletas</label><input type="number" id="parq-bicis" placeholder="0" min="0"></div>
+          <div class="question"><label style="font-size:12px;">Vehículos eléctricos</label><input type="number" id="parq-electricos" placeholder="0" min="0"></div>
+          <div class="question"><label style="font-size:12px;">Flota propia</label><input type="number" id="parq-flota" placeholder="0" min="0"></div>
+        </div>
+      </div>
+    </div>
+    <div class="question">
+      <label>¿Requieren zona de cargue y descargue?</label>
+      <div class="options-grid" id="cargue-opts">
+        <label class="option-item"><input type="radio" name="cargue" value="No"> No</label>
+        <label class="option-item"><input type="radio" name="cargue" value="Sí, básica"> Sí, básica</label>
+        <label class="option-item"><input type="radio" name="cargue" value="Sí, para camiones"> Sí, para camiones</label>
+        <label class="option-item"><input type="radio" name="cargue" value="Con muelle de cargue"> Con muelle de cargue</label>
+      </div>
+      <textarea id="cargue-detalle" style="margin-top:10px;" placeholder="¿Qué altura libre necesita el muelle? ¿Cuántos vehículos simultáneamente?"></textarea>
+    </div>
+    <div class="question">
+      <label>¿Requieren accesibilidad para personas con movilidad reducida?</label>
+      <div class="options-grid" id="accesibilidad-opts">
+        <label class="option-item"><input type="radio" name="accesibilidad" value="Normativo básico"> Normativo básico</label>
+        <label class="option-item"><input type="radio" name="accesibilidad" value="Diseño universal completo"> Diseño universal completo</label>
+        <label class="option-item"><input type="radio" name="accesibilidad" value="Tienen empleados con discapacidad"> Con empleados discapacitados</label>
+      </div>
+      <textarea id="accesibilidad-detalle" style="margin-top:10px;" placeholder="¿Algún requerimiento específico de accesibilidad?"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- S9 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">9</div>
+    <div>
+      <span class="section-title">Imagen corporativa y experiencia</span>
+      <span class="section-subtitle">Recepción, marca y atmósfera del espacio</span>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="section-note"><p><strong>¿Por qué te preguntamos esto?</strong> El espacio es una extensión de la identidad de la organización. Definir cómo debe sentirse y verse el entorno de trabajo es tan importante como la funcionalidad.</p></div>
+    <div class="question">
+      <label>¿Cómo quieren que se sienta el espacio de trabajo? *</label>
+      <div class="options-grid" id="atmosfera-opts">
+        <label class="option-item"><input type="checkbox" value="Formal e institucional"> Formal e institucional</label>
+        <label class="option-item"><input type="checkbox" value="Innovador y dinámico"> Innovador y dinámico</label>
+        <label class="option-item"><input type="checkbox" value="Cálido y colaborativo"> Cálido y colaborativo</label>
+        <label class="option-item"><input type="checkbox" value="Minimalista y eficiente"> Minimalista y eficiente</label>
+        <label class="option-item"><input type="checkbox" value="Tecnológico y premium"> Tecnológico y premium</label>
+        <label class="option-item"><input type="checkbox" value="Sostenible y biofílico"> Sostenible y biofílico</label>
+      </div>
+      <textarea id="atmosfera-detalle" style="margin-top:10px;" placeholder="¿Hay referencias de espacios que admiren? ¿Empresas cuyas oficinas sean referentes?"></textarea>
+    </div>
+    <div class="q-divider"></div>
+    <div class="question">
+      <label>¿Tienen manual de imagen corporativa o lineamientos de marca?</label>
+      <div class="options-grid" id="manual-marca-opts">
+        <label class="option-item"><input type="radio" name="manual-marca" value="Sí, manual completo"> Sí, manual completo</label>
+        <label class="option-item"><input type="radio" name="manual-marca" value="Lineamientos básicos"> Lineamientos básicos</label>
+        <label class="option-item"><input type="radio" name="manual-marca" value="No tenemos aún"> No tenemos aún</label>
+      </div>
+      <textarea id="marca-detalle" style="margin-top:10px;" placeholder="Colores corporativos, tipografías, elementos gráficos que deban estar presentes en el espacio..."></textarea>
+    </div>
+    <div class="q-divider"></div>
+    <div class="subsection">
+      <div class="subsection-title">Recepción y representación</div>
+      <div class="question">
+        <label>¿Qué tan importante es la recepción o lobby como espacio de representación? *</label>
+        <div class="options-grid" id="lobby-opts">
+          <label class="option-item"><input type="radio" name="lobby" value="Muy importante"> Muy importante</label>
+          <label class="option-item"><input type="radio" name="lobby" value="Moderadamente importante"> Moderadamente</label>
+          <label class="option-item"><input type="radio" name="lobby" value="Solo funcional"> Solo funcional</label>
+        </div>
+        <textarea id="lobby-detalle" style="margin-top:10px;" placeholder="¿Qué debe transmitir la recepción? ¿Elementos de marca que deban estar presentes?"></textarea>
+      </div>
+      <div class="question" style="margin-top:16px;">
+        <label>¿Necesitan sala de espera para visitantes?</label>
+        <input type="number" id="espera-aforo" placeholder="Capacidad de la sala de espera (número de personas)" min="0">
+      </div>
+      <div class="question" style="margin-top:16px;">
+        <label>¿Hay espacios donde quieran exhibir su proceso, portafolio o productos?</label>
+        <textarea id="exhibicion" placeholder="Ej: Showroom de productos, sala de muestras, galería de proyectos, muro de reconocimientos..."></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S10 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">10</div>
+    <div>
+      <span class="section-title">Requerimientos especiales y normativa</span>
+      <span class="section-subtitle">Condicionantes técnicos, legales y de expansión</span>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="section-note"><p><strong>Última sección.</strong> Esta información es crítica para que el programa cumpla con toda la normativa aplicable y prevea la evolución futura de la organización.</p></div>
+    <div class="question">
+      <label>¿Deben cumplir alguna norma específica?</label>
+      <div class="options-grid" id="normas-opts">
+        <label class="option-item"><input type="checkbox" value="NSR-10"> NSR-10</label>
+        <label class="option-item"><input type="checkbox" value="NTC accesibilidad"> NTC Accesibilidad</label>
+        <label class="option-item"><input type="checkbox" value="Bomberos"> Bomberos</label>
+        <label class="option-item"><input type="checkbox" value="Secretaría de Salud"> Secretaría de Salud</label>
+        <label class="option-item"><input type="checkbox" value="INVIMA"> INVIMA</label>
+        <label class="option-item"><input type="checkbox" value="Sup. Financiera"> Sup. Financiera</label>
+        <label class="option-item"><input type="checkbox" value="LEED / sostenibilidad"> LEED / sostenibilidad</label>
+        <label class="option-item"><input type="checkbox" value="Otro"> Otro</label>
+      </div>
+      <textarea id="normas-detalle" style="margin-top:10px;" placeholder="Especifica normas adicionales, entidades de control o requisitos regulatorios..."></textarea>
+    </div>
+    <div class="q-divider"></div>
+    <div class="question">
+      <label>¿Tienen requerimientos de seguridad especiales?</label>
+      <textarea id="seguridad-especial" placeholder="Ej: bóvedas, salas de control restringido, archivo confidencial bajo llave, sala de crisis..."></textarea>
+    </div>
+    <div class="q-divider"></div>
+    <div class="question">
+      <label>¿Manejan información confidencial que requiera espacios seguros?</label>
+      <div class="options-grid" id="confidencial-opts">
+        <label class="option-item"><input type="radio" name="confidencial" value="No"> No</label>
+        <label class="option-item"><input type="radio" name="confidencial" value="Datos personales / financieros"> Datos personales / financieros</label>
+        <label class="option-item"><input type="radio" name="confidencial" value="Secretos industriales"> Secretos industriales</label>
+        <label class="option-item"><input type="radio" name="confidencial" value="Sala SCIF o equivalente"> Sala SCIF o equivalente</label>
+      </div>
+    </div>
+    <div class="q-divider"></div>
+    <div class="question">
+      <label>¿Tienen planes de expansión que deban preverse en el diseño?</label>
+      <textarea id="expansion" placeholder="Ej: en 3 años duplicamos el área de producción / queremos poder agregar un piso / planeamos otra sucursal en el mismo predio..."></textarea>
+    </div>
+    <div class="q-divider"></div>
+    <div class="question">
+      <label>¿Hay algo más que no hayamos preguntado y sea relevante para el programa arquitectónico?</label>
+      <textarea id="extra-final" placeholder="Requerimientos especiales, condiciones del lote, restricciones presupuestales, plazos, cualquier información adicional..."></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- SUBMIT -->
+<div class="submit-section">
+  <h3>¡Gracias por tu tiempo!</h3>
+  <p>Con esta información construiremos el programa arquitectónico de tu organización.<br>Nos pondremos en contacto contigo en los próximos días.</p>
+  <button class="btn-submit" id="btn-enviar" onclick="enviarFormulario()">Enviar cuestionario</button>
+</div>
+<div class="footer">MARTINEZ &amp; MELO · Architecture &amp; Engineer · Interior Design · Energy Improv</div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+function addRow() {
+  const tbody = document.getElementById('areas-tbody');
+  const tr = document.createElement('tr');
+  tr.innerHTML = '<td><input type="text" placeholder="Nombre del área"></td><td><input type="number" placeholder="0" min="0"></td><td><input type="text" placeholder="Nombre y cargo"></td>';
+  tbody.appendChild(tr);
+}
+function getChecked(containerOrName, type) {
+  if (type === 'radio') {
+    const el = document.querySelector(`input[name="${containerOrName}"]:checked`);
+    return el ? el.value : '';
+  }
+  const container = document.getElementById(containerOrName);
+  if (!container) return '';
+  return Array.from(container.querySelectorAll('input[type="checkbox"]:checked')).map(e => e.value).join(', ');
+}
+function val(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+function getAreas() {
+  const rows = document.querySelectorAll('#areas-tbody tr');
+  return Array.from(rows).map(r => {
+    const inputs = r.querySelectorAll('input');
+    return `${inputs[0]?.value || ''} (${inputs[1]?.value || '0'} personas) - ${inputs[2]?.value || ''}`;
+  }).filter(r => r.trim() !== ' (0 personas) - ').join(' | ');
+}
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isError ? ' error' : '');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 5000);
+}
+async function enviarFormulario() {
+  const nombre = val('empresa-nombre');
+  if (!nombre) { showToast('Por favor ingresa el nombre de la empresa.', true); return; }
+  const btn = document.getElementById('btn-enviar');
+  btn.disabled = true; btn.textContent = 'Enviando...';
+
+  const salas = `Pequeñas: ${val('sala-pequena')} | Medianas: ${val('sala-mediana')} | Grandes: ${val('sala-grande')}`;
+  const parqueos = `Empleados: ${val('parq-empleados')} | Visitantes: ${val('parq-visitantes')} | Motos: ${val('parq-motos')} | Bicis: ${val('parq-bicis')} | Eléctricos: ${val('parq-electricos')} | Flota: ${val('parq-flota')}`;
+
+  const texto = `
+🏢 IDENTIFICACIÓN
+Empresa: ${nombre}
+Contacto: ${val('contacto-nombre')} | ${val('contacto-email')} | ${val('contacto-tel')}
+Sector: ${getChecked('sector', 'radio')} ${val('sector-otro')}
+Tipo: ${val('tipo-org')} | Empleados: ${val('num-empleados')}
+Crecimiento: ${val('crecimiento')}
+Ciudad / proyecto: ${val('ciudad')} | ${val('tipo-inmueble')}
+
+🏗️ ESTRUCTURA
+Áreas: ${val('num-areas')} | Jerarquía: ${getChecked('jerarquia-opts','checkbox')}
+Listado: ${getAreas()}
+Colaboración: ${getChecked('colaboracion','radio')} | ${val('colaboracion-detalle')}
+Personal externo: ${getChecked('externos','radio')} | ${val('externos-detalle')}
+
+📋 PERFIL DE ÁREAS
+Tipo trabajo: ${getChecked('tipo-trabajo-opts','checkbox')}
+Privacidad: ${val('privacidad-areas')}
+Puestos fijos: ${val('puestos-fijos')}
+Despachos: ${getChecked('despachos','radio')} | ${val('despachos-detalle')}
+Mobiliario especial: ${val('mobiliario-especial')}
+Archivo: ${getChecked('archivo-opts','checkbox')} | ${val('archivo-detalle')}
+Equipos especiales: ${val('equipos-especiales')}
+Bodega: ${getChecked('bodega-opts','checkbox')} | ${val('bodega-detalle')}
+
+⏰ MODELO DE TRABAJO
+Modalidad: ${getChecked('modalidad','radio')} | ${val('modalidad-detalle')}
+Turnos: ${val('turnos')} | % híbrido: ${val('pct-hibrido')}%
+Hot desking: ${getChecked('hotdesk','radio')}
+24/7: ${val('operacion247')}
+
+🤝 REUNIONES
+Salas: ${salas}
+Boardroom: ${getChecked('boardroom','radio')} | ${val('boardroom-detalle')}
+Equipamiento: ${getChecked('equip-salas-opts','checkbox')}
+Eventos: ${getChecked('eventos','radio')} | ${val('eventos-detalle')}
+Auditorio: aforo ${val('aforo-auditorio')} | ${val('tipo-auditorio')}
+Informal: ${getChecked('informal','radio')} | ${val('informal-detalle')}
+
+🍽️ BIENESTAR
+Cafetería: ${getChecked('cafeteria','radio')} | Aforo: ${val('aforo-cafeteria')}
+Operador: ${getChecked('cocina-op','radio')}
+Lounge: ${getChecked('lounge','radio')} | ${val('lounge-detalle')}
+Bienestar especial: ${getChecked('bienestar-especial-opts','checkbox')}
+Baños: ${val('banos-detalle')}
+Vestieres: ${getChecked('vestier-opts','checkbox')}
+
+⚙️ ZONAS TÉCNICAS
+Servidores: ${getChecked('servidores','radio')} | ${val('servidores-detalle')}
+Eléctrico: ${getChecked('electrico-opts','checkbox')}
+Climatización: ${val('climatizacion')}
+Aseo: ${getChecked('aseo','radio')}
+Seguridad: ${getChecked('seguridad-opts','checkbox')}
+Residuos: ${getChecked('residuos','radio')} | ${val('residuos-detalle')}
+
+🚗 ACCESOS Y CIRCULACIONES
+Accesos: ${getChecked('accesos-opts','checkbox')} | ${val('accesos-detalle')}
+Parqueos: ${parqueos}
+Cargue: ${getChecked('cargue','radio')} | ${val('cargue-detalle')}
+Accesibilidad: ${getChecked('accesibilidad','radio')} | ${val('accesibilidad-detalle')}
+
+🎨 IMAGEN CORPORATIVA
+Atmósfera: ${getChecked('atmosfera-opts','checkbox')} | ${val('atmosfera-detalle')}
+Manual de marca: ${getChecked('manual-marca','radio')} | ${val('marca-detalle')}
+Lobby: ${getChecked('lobby','radio')} | ${val('lobby-detalle')}
+Sala de espera: ${val('espera-aforo')} personas
+Exhibición: ${val('exhibicion')}
+
+📐 NORMATIVA Y ESPECIALES
+Normas: ${getChecked('normas-opts','checkbox')} | ${val('normas-detalle')}
+Seguridad especial: ${val('seguridad-especial')}
+Confidencial: ${getChecked('confidencial','radio')}
+Expansión: ${val('expansion')}
+Adicional: ${val('extra-final')}
+`.trim();
+
+  const chunks = [];
+  for (let i = 0; i < texto.length; i += 1900) chunks.push(texto.substring(i, i + 1900));
+
+  try {
+    const res = await fetch('/.netlify/functions/submit-empresa', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nombre, respuestas: chunks })
+    });
+    if (res.ok) {
+      showToast('✓ Cuestionario enviado exitosamente. ¡Gracias!', false);
+      btn.textContent = '¡Enviado con éxito!';
+      btn.style.background = '#5a7a5a';
+    } else {
+      const txt = await res.text();
+      showToast('Error al enviar: ' + txt, true);
+      btn.disabled = false; btn.textContent = 'Enviar cuestionario';
+    }
+  } catch(err) {
+    showToast('Error de conexión. Revisa tu internet.', true);
+    btn.disabled = false; btn.textContent = 'Enviar cuestionario';
+  }
+}
+</script>
+</body>
+</html>
